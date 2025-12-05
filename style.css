@@ -68,8 +68,12 @@ body {
 }
 
 /* 內容區 */
+/* 內容區 */
 .content {
     flex: 1;
     padding: 40px;
     font-size: 22px;
+    background-color: #0D0D0D; /* 新增這一行 */
+    color: #FFFFFF; /* 建議加上文字顏色，避免黑底黑字看不到 */
+    
 }
