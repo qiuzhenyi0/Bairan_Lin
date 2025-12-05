@@ -30,6 +30,7 @@ body {
 .layout {
     display: flex;
     min-height: calc(100vh - 100px);
+    color: #0D0D0D;
 }
 
 /* 左側欄 */
@@ -71,5 +72,4 @@ body {
     flex: 1;
     padding: 40px;
     font-size: 22px;
-    color: #0D0D0D;
 }
