@@ -1,46 +1,74 @@
-
-:root{
-  --bg:#ffffff;
-  --text:#222;
-  --muted:#666;
-  --accent:#6fe0c8; /* thin mint */
-  --panel:#fafafa;
-  --mono: "Courier New", Courier, monospace;
+body {
+    margin: 0;
+    font-family: "Noto Sans TC", sans-serif;
 }
-*{box-sizing:border-box}
-body{
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", Arial;
-  margin:0;background:var(--bg);color:var(--text);line-height:1.5;
+
+/* 上方橫條 */
+.header {
+    width: 100%;
+    background: #A1F1E1; /* 薄荷綠 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    font-size: 36px;
+    box-sizing: border-box;
 }
-.site-header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #eee}
-.brand{font-weight:700}
-.nav a{margin-left:12px;color:var(--muted);text-decoration:none;font-size:14px}
-.container{max-width:980px;margin:28px auto;padding:0 20px}
-.intro h1{margin:0 0 6px;font-size:22px}
-.lead{color:var(--muted);margin:0 0 18px}
-.flex-row{display:flex;gap:18px;flex-wrap:wrap}
-.panel{background:var(--panel);padding:12px;border:1px solid #eee;border-radius:6px;min-width:220px}
-.luck{font-family:var(--mono);font-size:36px;color:var(--accent);margin:8px 0}
-.pixel-dog{width:120px;height:90px;position:relative;cursor:pointer}
-.dog-body{width:72px;height:48px;background:#333;border-radius:8px;position:absolute;left:8px;top:24px}
-.dog-tail{width:40px;height:8px;background:#333;position:absolute;right:6px;top:34px;border-radius:6px;transform-origin:left center;transition:transform .2s linear}
-.hint{color:var(--muted);font-size:13px;margin-top:6px}
 
-/* terminal */
-.terminal-wrap{margin-top:22px}
-.terminal{background:#000;color:#6fffd6;padding:14px;height:160px;overflow:auto;font-family:var(--mono);font-size:13px;border-radius:6px;border:1px solid #111}
-.terminal-input{margin-top:8px}
-.terminal-input input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:var(--mono)}
+.title {
+    font-size: 42px;
+    font-weight: 700;
+}
 
-/* sky / meteor */
-.sky{height:120px;background:linear-gradient(#06121a,#09232b);border-radius:6px;margin-top:10px;position:relative;overflow:hidden}
-.meteor{position:absolute;width:3px;height:80px;background:linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0));opacity:0.9;transform:rotate(-30deg);filter:blur(0.6px)}
+.numbers {
+    font-size: 20px;
+    opacity: 0.8;
+    letter-spacing: 6px;
+}
 
-/* footer */
-.site-footer{padding:18px 24px;border-top:1px solid #eee;text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+/* 主體 */
+.layout {
+    display: flex;
+    height: calc(100vh - 100px);
+}
 
-/* responsive */
-@media(max-width:600px){
-  .flex-row{flex-direction:column}
-  .panel{width:100%}
+/* 左側欄 */
+.sidebar {
+    width: 180px;
+    background: #D4FBF5;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    font-size: 22px;
+    line-height: 2.4;
+    position: relative;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #111;
+    transition: 0.2s;
+}
+
+.sidebar a:hover {
+    transform: translateX(6px);
+    color: #008B74;
+}
+
+/* 小狗尻尾 */
+.dog {
+    position: absolute;
+    bottom: 20px;
+}
+
+.dog img {
+    width: 120px;
+}
+
+/* 內容區 */
+.content {
+    flex: 1;
+    padding: 40px;
+    font-size: 22px;
 }
