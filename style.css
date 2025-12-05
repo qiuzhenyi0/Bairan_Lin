@@ -26,10 +26,10 @@ body {
     letter-spacing: 6px;
 }
 
-/* 主體 */
+/* 主體區域 */
 .layout {
     display: flex;
-    height: calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
 }
 
 /* 左側欄 */
@@ -56,7 +56,7 @@ body {
     color: #008B74;
 }
 
-/* 小狗尻尾 */
+/* 小狗在側欄底部 */
 .dog {
     position: absolute;
     bottom: 20px;
