@@ -1,66 +1,54 @@
-
-<!doctype html>
-<html lang="zh-Hant">
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Project Zero / 零計畫</title>
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <title>Project Zero Terminal</title>
+    <style>
+        body {
+            background: #0d0d0d;
+            color: #00ffcc;
+            font-family: "JetBrains Mono", monospace;
+            padding: 40px;
+            font-size: 20px;
+        }
+        #t { white-space: pre-line; }
+        a {
+            color: #00ffd5;
+            text-decoration: none;
+            border: 1px solid #00ffd5;
+            padding: 6px 16px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        a:hover { background: #00ffd5; color: #000; }
+    </style>
 </head>
 <body>
-<header class="site-header">
-  <div class="brand">Project Zero / 零計畫</div>
-  <nav class="nav">
-    <a href="index.html">首頁</a>
-    <a href="diary/2025-12-04.html">日記</a>
-    <a href="blog/">部落格</a>
-    <a href="gallery/">相簿</a>
-    <a href="collections.html">收藏</a>
-  </nav>
-</header>
 
-<main class="container">
-  <section class="intro">
-    <h1>你好，我是小狗。這裡是我的零計畫。</h1>
-    <p class="lead">素白校網外觀 × 薄荷綠點綴 · 初代網路偽終端介面 · 極簡但暗藏功能。</p>
-    <div class="flex-row">
-      <div class="panel">
-        <h3>今日幸運指數</h3>
-        <div id="luck" class="luck">—</div>
-        <button id="refreshLuck">重新計算</button>
-      </div>
+<pre id="t"></pre>
+<a id="enter" href="home.html" style="display:none;">ENTER</a>
 
-      <div class="panel">
-        <h3>小狗</h3>
-        <div class="pixel-dog" id="pixelDog" title="點擊搖尾巴">
-          <!-- simple pixel dog built with CSS -->
-          <div class="dog-body"></div>
-          <div class="dog-tail" id="dogTail"></div>
-        </div>
-        <div class="hint">點小狗讓牠搖尾巴</div>
-      </div>
-    </div>
-  </section>
+<script>
+const text = [
+    "$ Project Zero initializing...",
+    "$ loading modules...",
+    "$ scanning memories...",
+    "$ compiling Zero System...",
+    "$ ready."
+];
+let i = 0;
+function typeLine() {
+    const t = document.getElementById("t");
+    if (i < text.length) {
+        t.textContent += text[i] + "\n";
+        i++;
+        setTimeout(typeLine, 600);
+    } else {
+        document.getElementById("enter").style.display = "inline-block";
+    }
+}
+typeLine();
+</script>
 
-  <section class="terminal-wrap">
-    <h3>偽命令列（古早網路風）</h3>
-    <div id="terminal" class="terminal" tabindex="0"></div>
-    <div class="terminal-input">
-      <input id="cmd" placeholder="type 'help' and press Enter" />
-    </div>
-  </section>
-
-  <section class="mini-animations">
-    <h3>流星</h3>
-    <div id="sky" class="sky"></div>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <small>Project Zero · 原型由小狗委託 · 薄荷綠主題</small>
-</footer>
-
-<script src="assets/js/marked.min.js"></script>
-<script src="assets/js/main.js"></script>
 </body>
 </html>
