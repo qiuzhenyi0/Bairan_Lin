@@ -108,13 +108,13 @@ body {
 .calendar-container {
     border: 1px solid #aaa;
     padding: 15px;
-    color: #0D0D0D;
+    color: #AFE2DE;
 }
 #current-date-display {
     font-size: 1.2em;
     font-weight: bold;
     margin-bottom: 10px;
-    color:#0D0D0D;
+    color:#8BC6B4;
 }
 .calendar-container textarea {
     width: 100%;
