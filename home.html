@@ -26,11 +26,43 @@
     </div>
 
     <div class="content">
-        <h1>歡迎回來</h1>
-        <p>所有分頁都已經為你準備好，可以開始寫內容。</p>
+    <h1>歡迎回來</h1>
+    
+    <div class="social-module">
+        <a href="#" class="social-icon">IG</a>
+        <a href="#" class="social-icon">FB</a>
+        <a href="#" class="social-icon">Threads</a>
     </div>
 
+    <div class="text-area">
+        <p>在此輸入你的文字內容...</p>
+    </div>
+
+    <div class="calendar-container">
+        <div id="current-date-display">載入日期中...</div>
+        <textarea placeholder="點擊備註今日事項..."></textarea>
+    </div>
+
+    <div class="image-slider">
+        <div class="slides">
+            <img src="🔸1.jpg" alt="圖片 1">
+            <img src="🔸2.jpg" alt="圖片 2">
+            <img src="🔸3.jpg" alt="圖片 3">
+        </div>
+        <div class="slider-controls">
+            <span>⬅️ 滑動查看更多 ➡️</span>
+        </div>
+    </div>
 </div>
+
+<script>
+    function updateDate() {
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        document.getElementById('current-date-display').innerText = "今天是：" + now.toLocaleDateString('zh-TW', options);
+    }
+    updateDate();
+</script>
 
 </body>
 </html>
