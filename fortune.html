@@ -13,7 +13,6 @@
 </div>
 
 <div class="layout">
-
     <div class="sidebar">
         <a href="home.html">自介</a>
         <a href="diary.html">日記</a>
@@ -22,23 +21,22 @@
         <a href="collections.html">收藏</a>
         <a href="fortune.html">幸運指數</a>
 
-        <div class="dog"><img src="dog.gif"></div>
+        <div id="pixelDog" style="cursor:pointer;">
+            <img src="dog.gif" alt="dog">
+            <div id="dogTail"></div>
+        </div>
     </div>
 
-     <div class="content">
+    <div class="content">
         <h2>你的今日幸運指數是：</h2>
-        <p id="luck" style="font-size:48px; margin-top:20px;">...</p>
-    
-        <button id="refreshLuck">重新請求神諭</button>
-
-        <div id="sky" style="display:none;"></div> 
-        <div id="pixelDog" style="display:none;"><div id="dogTail"></div></div>
+        <p id="luck" style="font-size:48px; margin-top:20px;">讀取神諭中...</p>
+        
+        <div id="sky"></div>
         <div id="terminal" style="display:none;"><input id="cmd"></div>
     </div>
+</div>
 
-    <script src="main.js"></script> 
-
-    </div>
+<script src="main.js"></script>
 
 </body>
 </html>
