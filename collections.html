@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <title>收藏 Collections</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* 讓影片不要超出螢幕，並增加一點間距 */
+        .video-item {
+            margin-bottom: 30px;
+            max-width: 100%;
+        }
+        video {
+            width: 100%;
+            max-width: 600px; /* 限制最大寬度，避免影片太大 */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .video-title {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
 
@@ -15,25 +33,44 @@
 <div class="layout">
 
     <div class="sidebar">
-    <a href="home.html">自介</a>
-    <a href="diary.html">日記</a>
-    <a href="blog.html">部落格</a>
-    <a href="gallery.html">相簿</a>
-    <a href="collections.html">收藏</a>
-    <a href="fortune.html">幸運指數</a>
+        <a href="home.html">自介</a>
+        <a href="diary.html">日記</a>
+        <a href="blog.html">部落格</a>
+        <a href="gallery.html">相簿</a>
+        <a href="collections.html">收藏</a>
+        <a href="fortune.html">幸運指數</a>
 
-    <div id="pixelDog" class="dog-container">
-        <img src="GIF_20251224164146204.gif" alt="dog" class="sidebar-dog">
+        <div id="pixelDog" class="dog-container">
+            <img src="GIF_20251224164146204.gif" alt="dog" class="sidebar-dog">
+        </div>
     </div>
-</div>
-
 
     <div class="content">
-        <h2>收藏</h2>
+        <h2>我的影音收藏</h2>
         <p>放你喜歡的東西：文章、圖片、音樂、奇怪的小玩意。</p>
+
+        <hr style="border: 0.5px solid #333; margin: 20px 0;">
+
+        <div class="video-item">
+            <video controls>
+                <source src="收藏/exported+E67A7CEB-BC31-4430-9CDE-FD2156BB1490.mp4" type="video/mp4">
+                您的瀏覽器不支援影片播放。
+            </video>
+            <div class="video-title">收藏影片 A</div>
+        </div>
+
+        <div class="video-item">
+            <video controls>
+                <source src="收藏/exported+8898ACDC-E51E-42A0-AC77-9229DA02FC60.mp4" type="video/mp4">
+                您的瀏覽器不支援影片播放。
+            </video>
+            <div class="video-title">收藏影片 B</div>
+        </div>
     </div>
 
 </div>
+
+<script src="main.js"></script>
 
 </body>
 </html>
