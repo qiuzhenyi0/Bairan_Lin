@@ -57,15 +57,26 @@
     color: #008B74;
 }
 
-/* 小狗在側欄底部 */
-.dog {
-    position: absolute;
-    bottom: 20px;
+/* 小狗容器：控制在側邊欄的位置 */
+.dog-container {
+    cursor: pointer;
+    margin-top: 50px; /* 調整與上方選單的距離 */
+    text-align: center;
+    transition: transform 0.2s;
 }
 
-.dog img {
-    width: 120px;
+.sidebar-dog {
+    width: 80px;      /* 調整小狗大小 */
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
+
+/* 點擊時的跳動效果 */
+.dog-jump {
+    transform: scale(1.1) translateY(-5px);
+}
+
 /* 內容區 */
 .content {
     flex: 1;
