@@ -22,21 +22,18 @@ window.onload = function() {
   }
 
   // --- 2. 小狗互動邏輯 ---
-  const tail = document.getElementById('dogTail');
-  const dog = document.getElementById('pixelDog');
-  let wagTimeout;
+    const dog = document.getElementById('pixelDog');
+    if (dog) {
+        dog.onclick = function() {
+            // 因為現在沒有獨立的尾巴方塊了，我們可以讓整張圖縮放一下表示互動
+            dog.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                dog.style.transform = 'scale(1)';
+            }, 200);
+        };
+    }
+    
 
-  if (dog && tail) {
-    dog.onclick = function() {
-      // 點擊時尾巴往上翹
-      tail.style.transform = 'rotate(40deg)';
-      clearTimeout(wagTimeout);
-      // 0.3秒後自動彈回原位
-      wagTimeout = setTimeout(() => {
-        tail.style.transform = 'rotate(-10deg)';
-      }, 300);
-    };
-  }
 
   // --- 3. 裝飾流星 ---
   const sky = document.getElementById('sky');
