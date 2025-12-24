@@ -5,21 +5,29 @@
     <title>收藏 Collections</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 讓影片不要超出螢幕，並增加一點間距 */
-        .video-item {
-            margin-bottom: 30px;
-            max-width: 100%;
+        /* 影片展示區塊樣式 */
+        .video-container {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        .video-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .video-card h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #00ffcc; /* 與你的主題色呼應 */
         }
         video {
             width: 100%;
-            max-width: 600px; /* 限制最大寬度，避免影片太大 */
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .video-title {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #888;
+            height: auto;
+            border-radius: 2px;
+            border: 1px solid #444;
         }
     </style>
 </head>
@@ -31,7 +39,6 @@
 </div>
 
 <div class="layout">
-
     <div class="sidebar">
         <a href="home.html">自介</a>
         <a href="diary.html">日記</a>
@@ -46,31 +53,29 @@
     </div>
 
     <div class="content">
-        <h2>我的影音收藏</h2>
+        <h2>收藏</h2>
         <p>放你喜歡的東西：文章、圖片、音樂、奇怪的小玩意。</p>
 
-        <hr style="border: 0.5px solid #333; margin: 20px 0;">
+        <div class="video-container">
+            <div class="video-card">
+                <h3>Rekindle</h3>
+                <video controls>
+                    <source src="collections/Rekindle.MP4" type="video/mp4">
+                    您的瀏覽器不支援影片播放。
+                </video>
+            </div>
 
-        <div class="video-item">
-            <video controls>
-                <source src="收藏/exported+E67A7CEB-BC31-4430-9CDE-FD2156BB1490.mp4" type="video/mp4">
-                您的瀏覽器不支援影片播放。
-            </video>
-            <div class="video-title">收藏影片 A</div>
-        </div>
-
-        <div class="video-item">
-            <video controls>
-                <source src="收藏/exported+8898ACDC-E51E-42A0-AC77-9229DA02FC60.mp4" type="video/mp4">
-                您的瀏覽器不支援影片播放。
-            </video>
-            <div class="video-title">收藏影片 B</div>
+            <div class="video-card">
+                <h3>Ignition</h3>
+                <video controls>
+                    <source src="collections/Ignition.MP4" type="video/mp4">
+                    您的瀏覽器不支援影片播放。
+                </video>
+            </div>
         </div>
     </div>
-
 </div>
 
 <script src="main.js"></script>
-
 </body>
 </html>
