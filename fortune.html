@@ -1,4 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>今日幸運指數</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+    <div class="title">今日幸運指數</div>
+    <div class="numbers">Fortune</div>
+</div>
+
 <div class="layout">
+
     <div class="sidebar">
         <a href="home.html">自介</a>
         <a href="diary.html">日記</a>
@@ -7,20 +22,9 @@
         <a href="collections.html">收藏</a>
         <a href="fortune.html">幸運指數</a>
 
-        <div id="pixelDog" style="cursor:pointer; position:relative; display:inline-block; margin-top:20px;">
-            <img src="GIF_20251224163156097.gif" alt="小狗" style="width: 80px; height: auto;">
-            <div id="dogTail" style="
-                width: 14px; 
-                height: 6px; 
-                background: #555; 
-                position: absolute; 
-                bottom: 12px; 
-                right: 4px; 
-                transform-origin: left center; 
-                transition: transform 0.3s; 
-                transform: rotate(-10deg);
-                border-radius: 3px;
-            "></div>
+        <div id="pixelDog" style="cursor:pointer; position:relative; margin-top:20px; display:inline-block;">
+            <img src="GIF_20251224163156097.gif" alt="dog" style="width:80px; height:auto;">
+            <div id="dogTail" style="width:12px; height:6px; background:#666; position:absolute; bottom:12px; right:4px; transform-origin:left center; transition:transform 0.3s; transform:rotate(-10deg); border-radius:3px;"></div>
         </div>
     </div>
 
@@ -30,4 +34,10 @@
         
         <div id="sky"></div>
     </div>
+
 </div>
+
+<script src="main.js"></script>
+
+</body>
+</html>
