@@ -1,13 +1,14 @@
 
 // main front-end behaviors: luck calc, terminal, pixel dog tail wag, meteor spawner
 (function(){
-  // luck (cold oracle voice)
+  // 幸運計算邏輯
   function calcLuck(dateStr){
     const s = dateStr || new Date().toDateString();
     let n = 0;
-    for(let i=0;i<s.length;i++) n += s.charCodeAt(i);
+    for(let i=0; i<s.length; i++) n += s.charCodeAt(i);
     return n % 101;
   }
+
   function luckPhrase(score){
     if(score>80) return "預言：今日宇宙偏向於你。";
     if(score>60) return "預言：可嘗試，亦不保證。";
@@ -15,14 +16,26 @@
     if(score>20) return "預言：小心選擇你的疲憊。";
     return "預言：今日宜靜。";
   }
+
   function renderLuck(){
     const el = document.getElementById('luck');
+    if(!el) return; // 如果找不到標籤就跳出，不報錯
     const score = calcLuck();
     el.textContent = score + " — " + luckPhrase(score);
-    el.title = "冷淡神諭者：「" + luckPhrase(score) + "」";
   }
-  document.getElementById('refreshLuck').addEventListener('click',renderLuck);
+
+  // 安全地綁定事件
+  const refreshBtn = document.getElementById('refreshLuck');
+  if(refreshBtn) {
+    refreshBtn.addEventListener('click', renderLuck);
+  }
+
   renderLuck();
+
+  // 其他功能（小狗、終端機）建議也加上 if 判斷，或是確保 HTML 裡有對應 ID
+  // ... 其餘代碼 ...
+  })();
+
 
   // pixel dog tail wag
   const tail = document.getElementById('dogTail');
