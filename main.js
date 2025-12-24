@@ -1,5 +1,5 @@
 window.onload = function() {
-  // --- 1. 幸運計算 (日期固定隨機) ---
+  // --- 1. 命定幸運計算 ---
   function calcLuck() {
     const s = new Date().toDateString();
     let n = 0;
@@ -21,22 +21,24 @@ window.onload = function() {
     luckEl.textContent = score + " — " + luckPhrase(score);
   }
 
-  // --- 2. 小狗搖尾巴 ---
+  // --- 2. 小狗互動邏輯 ---
   const tail = document.getElementById('dogTail');
   const dog = document.getElementById('pixelDog');
   let wagTimeout;
 
   if (dog && tail) {
     dog.onclick = function() {
-      tail.style.transform = 'rotate(40deg)'; // 尾巴向上翹
+      // 點擊時尾巴往上翹
+      tail.style.transform = 'rotate(40deg)';
       clearTimeout(wagTimeout);
+      // 0.3秒後自動彈回原位
       wagTimeout = setTimeout(() => {
-        tail.style.transform = 'rotate(-6deg)'; // 回到原位
+        tail.style.transform = 'rotate(-10deg)';
       }, 300);
     };
   }
 
-  // --- 3. 自動流星 (純視覺裝飾) ---
+  // --- 3. 裝飾流星 ---
   const sky = document.getElementById('sky');
   if (sky) {
     function spawnMeteor() {
@@ -46,10 +48,10 @@ window.onload = function() {
         width: 2px;
         height: 2px;
         background: white;
-        box-shadow: 0 0 5px white;
+        box-shadow: 0 0 4px white;
         left: ${Math.random() * 80 + 10}%;
         top: ${Math.random() * 20}%;
-        z-index: 1;
+        pointer-events: none;
         opacity: 1;
         transition: transform 1.2s linear, opacity 1.2s linear;
       `;
@@ -60,6 +62,6 @@ window.onload = function() {
       });
       setTimeout(() => m.remove(), 1300);
     }
-    setInterval(spawnMeteor, 6000);
+    setInterval(spawnMeteor, 8000);
   }
 };
