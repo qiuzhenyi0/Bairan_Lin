@@ -151,3 +151,13 @@
     font-size: 12px;
     margin-top: 5px;
 }
+.social-icon {
+    text-decoration: none; /* 移除底線 */
+    font-size: 24px;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+.social-icon:hover {
+    color: #007bff; /* 滑鼠懸停變色 */
+}
+
