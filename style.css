@@ -177,7 +177,8 @@
 /* 光遇區塊裝飾 */
 .sky-section {
     border-left: 5px solid #87CEEB; /* 天藍色邊框 */
-    background: #fdfdfd;
+    background: #0D0D0D;
+    color: #6599A5;
 }
 
 /* 讓圖片滑動更順暢 */
