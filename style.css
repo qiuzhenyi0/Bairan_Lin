@@ -1,9 +1,12 @@
-    body {
+/* --- 基礎設定 --- */
+body {
     margin: 0;
-    font-family: "Noto Sans TC", sans-serif;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background-color: #f4f4f4;
+    overflow-x: hidden;
 }
 
-/* 上方橫條 */
+/* --- 上方橫條 (Header) --- */
 .header {
     width: 100%;
     background: #00F9C7; /* 薄荷綠 */
@@ -11,188 +14,233 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 40px;
-    font-size: 36px;
     box-sizing: border-box;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
 }
 
 .title {
-    font-size: 42px;
+    font-size: clamp(24px, 5vw, 42px); /* 隨螢幕縮放字體 */
     font-weight: 700;
-}
-
-.numbers {
-    font-size: 20px;
-    opacity: 0.8;
-    letter-spacing: 6px;
-}
-
-/* 主體區域 */
-.layout {
-    display: flex;
-    min-height: calc(100vh - 100px);
     color: #0D0D0D;
 }
 
-/* 左側欄 */
+.numbers {
+    font-size: 18px;
+    opacity: 0.8;
+    letter-spacing: 4px;
+}
+
+/* --- 主體區域佈局 --- */
+.layout {
+    display: flex;
+    min-height: calc(100vh - 100px);
+}
+
+/* --- 左側欄 (Sidebar) --- */
 .sidebar {
-    width: 180px;
+    width: 200px;
     background: #A4D6CC;
     padding: 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    font-size: 22px;
-    line-height: 2.4;
-    position: relative;
+    gap: 10px;
+    flex-shrink: 0; /* 防止側邊欄被壓縮 */
 }
 
 .sidebar a {
     text-decoration: none;
     color: #111;
-    transition: 0.2s;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    transition: 0.3s ease;
 }
 
 .sidebar a:hover {
-    transform: translateX(6px);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(8px);
     color: #008B74;
 }
 
-/* 小狗容器：控制在側邊欄的位置 */
 .dog-container {
-    cursor: pointer;
-    margin-top: 50px; /* 調整與上方選單的距離 */
+    margin-top: auto; /* 讓小狗固定在側邊欄底部 */
+    padding: 20px 0;
     text-align: center;
-    transition: transform 0.2s;
 }
 
 .sidebar-dog {
-    width: 80px;      /* 調整小狗大小 */
+    width: 80px;
     height: auto;
-    display: block;
-    margin: 0 auto;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
 }
 
-/* 點擊時的跳動效果 */
-.dog-jump {
-    transform: scale(1.1) translateY(-5px);
-}
-
-/* 內容區 */
+/* --- 內容區 (Content) --- */
 .content {
     flex: 1;
-    padding: 40px;
-    font-size: 22px;
-    background-color: #0D0D0D; /* 新增這一行 */
-    color: #FFFFFF; /* 建議加上文字顏色，避免黑底黑字看不到 */
-    
-}
-/* 讓內容區塊垂直排列並置中 */
-.content {
+    background-color: #0D0D0D; /* 深色背景 */
+    color: #FFFFFF;
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* 每個模組之間的間距 */
-    padding: 20px;
+    gap: 25px;
+    max-width: calc(100vw - 200px); /* 限制最大寬度防止圖片撐爆 */
+    box-sizing: border-box;
 }
 
-/* 1. 社群連結樣式 */
-.social-module {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
+h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
 }
+
+/* 1. 社群連結 */
+.social-module {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    padding: 15px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    background: #1a1a1a;
+}
+
 .social-icon {
-    margin: 0 10px;
     text-decoration: none;
-    color: #333;
+    font-size: 22px;
+    color: #00F9C7;
     font-weight: bold;
+    transition: 0.3s;
+}
+
+.social-icon:hover {
+    color: #FFFFFF;
+    transform: translateY(-3px);
 }
 
 /* 2. 文字區域 */
 .text-area {
-    min-height: 100px;
-    border: 1px solid #ddd;
-    padding: 15px;
-    color: #6599A5;
-}
-
-/* 3. 日曆模塊 */
-.calendar-container {
-    border: 1px solid #aaa;
-    padding: 15px;
+    background: #1a1a1a;
+    border-left: 5px solid #6599A5;
+    padding: 20px;
+    border-radius: 0 10px 10px 0;
+    line-height: 1.8;
     color: #AFE2DE;
 }
-#current-date-display {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color:#8BC6B4;
-}
-.calendar-container textarea {
-    width: 100%;
-    height: 60px;
-    border: 1px dashed #ccc;
+
+.text-area p { margin: 5px 0; }
+
+.sky-section {
+    border-left-color: #87CEEB;
+    background: #111e25; /* 微微的深藍調 */
 }
 
-/* 4. 圖片滑動 (對應手稿底部) */
-.image-slider {
-    overflow-x: auto;
-    white-space: nowrap;
+/* 3. 日曆與今日事項 (字體加大) */
+.calendar-container {
+    background: #1a1a1a;
     border: 1px solid #333;
-    padding: 10px;
+    padding: 20px;
+    border-radius: 10px;
 }
+
+#current-date-display {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #8BC6B4;
+}
+
+.today-task {
+    width: 100%;
+    min-height: 100px;
+    font-size: 28px; /* 依照要求加大 */
+    font-weight: 900;
+    color: #00F9C7;
+    background: transparent;
+    border: 1px dashed #444;
+    padding: 15px;
+    box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+}
+
+/* 4. 圖片滑動牆 (關鍵修正) */
+.image-slider {
+    width: 100%;
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 15px;
+    box-sizing: border-box;
+    overflow: hidden; /* 隱藏外溢 */
+}
+
+.slider-title {
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 15px;
+    padding-left: 5px;
+}
+
+.slides {
+    display: flex;
+    overflow-x: auto; /* 啟用水平滑動 */
+    gap: 15px;
+    padding-bottom: 10px;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #333 transparent;
+}
+
+/* 隱藏捲軸但保持滑動 (Chrome/Safari) */
+.slides::-webkit-scrollbar {
+    height: 6px;
+}
+.slides::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+
 .slides img {
-    height: 150px;
-    margin-right: 10px;
-    border-radius: 5px;
-    display: inline-block;
+    height: 180px; /* 固定高度 */
+    width: auto;   /* 寬度自適應比例 */
+    flex-shrink: 0; /* 關鍵：防止圖片被擠壓 */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
+    cursor: pointer;
 }
+
+.slides img:hover {
+    transform: scale(1.03);
+}
+
 .slider-controls {
     text-align: center;
     font-size: 12px;
-    margin-top: 5px;
-}
-.social-icon {
-    text-decoration: none; /* 移除底線 */
-    font-size: 24px;
-    margin: 0 10px;
-    transition: color 0.3s;
-}
-.social-icon:hover {
-    color: #007bff; /* 滑鼠懸停變色 */
-}
-/* 今日事項文字加大 */
-.today-task {
-    width: 100%;
-    height: 80px;
-    font-size: 24px; /* 加大字體 */
-    font-weight: bold;
-    color: #333;
-    border: none;
-    background: transparent;
-    padding: 10px 0;
-    font-family: inherit;
-    resize: none;
+    color: #555;
+    margin-top: 10px;
 }
 
-/* 光遇區塊裝飾 */
-.sky-section {
-    border-left: 5px solid #87CEEB; /* 天藍色邊框 */
-    background: #0D0D0D;
-    color: #6599A5;
+/* --- 響應式調整 (手機版) --- */
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column; /* 側邊欄變頂部或隱藏 */
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .content {
+        max-width: 100vw;
+        padding: 15px;
+    }
+    .slides img {
+        height: 140px; /* 手機上縮小圖片高度 */
+    }
+    .today-task {
+        font-size: 22px;
+    }
 }
-
-/* 讓圖片滑動更順暢 */
-.slides {
-    display: flex;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 10px 0;
-    -webkit-overflow-scrolling: touch; /* 讓手機滑動更順 */
-}
-
-.slides img {
-    height: 160px;
-    border-radius: 6px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-}
-
