@@ -82,7 +82,36 @@
     </div>
 </div>
 
-<script>
+
+    <script>
+    // 檢查瀏覽器是否支援攝影機
+    async function checkCamera() {
+        try {
+            await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (err) {
+            alert("請開啟攝影機權限以啟動粒子互動特效！");
+        }
+    }
+    checkCamera();
+
+    // 核心優化：即使沒偵測到手，粒子也會持續繪製
+    function drawLoop() {
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // 如果沒有偵測到手，讓 target 預設在畫面中央
+        const defaultX = canvasElement.width / 2;
+        const defaultY = canvasElement.height / 2;
+
+        particles.forEach((p, i) => {
+            // 如果沒握拳，就繞著中心隨機漂浮
+            p.update(isFist ? currentHandX : defaultX, isFist ? currentHandY : defaultY, i);
+            p.draw();
+        });
+        requestAnimationFrame(drawLoop);
+    }
+    drawLoop(); // 啟動循環
+
+
     const videoElement = document.getElementById('input_video');
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
