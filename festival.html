@@ -2,110 +2,196 @@
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <title>Festival - Project Zero</title>
+    <title>Project Zero - Festival</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <style>
-        #video-container { position: relative; width: 100%; max-width: 800px; margin: auto; }
-        canvas { position: absolute; left: 0; top: 0; width: 100%; height: auto; }
-        video { width: 100%; height: auto; display: none; }
-        .hint { color: #00F9C7; text-align: center; margin-top: 10px; font-weight: bold; }
+        /* 強制右側內容區為純黑並填滿螢幕 */
+        .content {
+            background-color: #000 !important;
+            padding: 0 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 保持攝影機畫面比例 */
+            z-index: 1;
+        }
+
+        video { display: none; } /* 隱藏攝影機原始畫面 */
+
+        /* 浮動提示文字 */
+        .festival-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .festival-ui h2 {
+            color: #00F9C7;
+            margin: 0;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .festival-ui p {
+            color: #fff;
+            font-size: 16px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="title">Festival / 節慶</div>
-        <div class="numbers"><a href="index.html" style="color:inherit; text-decoration:none;">Back</a></div>
-    </div>
-    
-    <div class="content" style="background: #000; align-items: center;">
-        <h1>2025 新年特效</h1>
-        <p class="hint">請開啟攝影機：握緊拳頭匯聚，張開手掌散放</p>
-        
-        <div id="video-container">
-            <video id="input_video"></video>
-            <canvas id="output_canvas"></canvas>
+
+<div class="header">
+    <div class="title">Project Zero / 零計畫</div>
+    <div class="numbers">Festival Mode</div>
+</div>
+
+<div class="layout">
+    <div class="sidebar">
+        <a href="home.html">自介</a>
+        <a href="diary.html">日記</a>
+        <a href="blog.html">部落格</a>
+        <a href="gallery.html">相簿</a>
+        <a href="collections.html">收藏</a>
+        <a href="fortune.html">幸運指數</a>
+        <a href="festival.html">節慶</a>
+
+        <div id="pixelDog" class="dog-container">
+            <img src="GIF_20251224164146204.gif" alt="dog" class="sidebar-dog">
         </div>
     </div>
 
-    <script>
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
+    <div class="content">
+        <div class="festival-ui">
+            <h2>2025 New Year Event</h2>
+            <p>✊ 握拳：粒子匯聚成字<br>🖐️ 張手：粒子散開</p>
+        </div>
+        <video id="input_video"></video>
+        <canvas id="output_canvas"></canvas>
+    </div>
+</div>
+
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+
+    let particles = [];
+    let textPoints = [];
+    let isFist = false;
+
+    // 1. 預先計算 "HAPPY NEW YEAR" 的座標點
+    function initTextPoints() {
+        const tempCanvas = document.createElement('canvas');
+        const tCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = 800;
+        tempCanvas.height = 200;
+        tCtx.fillStyle = "white";
+        tCtx.font = "bold 80px Arial";
+        tCtx.textAlign = "center";
+        tCtx.fillText("HAPPY NEW YEAR", 400, 110);
         
-        let particles = [];
-        let isFist = false;
-
-        // 粒子類別
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvasElement.width;
-                this.y = Math.random() * canvasElement.height;
-                this.destX = this.x;
-                this.destY = this.y;
-                this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
-                this.size = Math.random() * 3 + 1;
-            }
-            update(handX, handY) {
-                if (isFist) {
-                    // 握拳時朝手心匯聚（或組成字體，這裡先做匯聚效果）
-                    this.x += (handX - this.x) * 0.1;
-                    this.y += (handY - this.y) * 0.1;
-                } else {
-                    // 張開時隨機散開
-                    this.x += (Math.random() - 0.5) * 10;
-                    this.y += (Math.random() - 0.5) * 10;
-                }
-            }
-            draw() {
-                canvasCtx.fillStyle = this.color;
-                canvasCtx.beginPath();
-                canvasCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                canvasCtx.fill();
-            }
-        }
-
-        // 初始化粒子
-        for(let i=0; i<200; i++) particles.push(new Particle());
-
-        function onResults(results) {
-            canvasElement.width = videoElement.videoWidth;
-            canvasElement.height = videoElement.videoHeight;
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const hand = results.multiHandLandmarks[0];
-                const indexTip = hand[8]; // 食指指尖
-                const thumbTip = hand[4]; // 大拇指指尖
-                
-                // 簡易判定握拳：指尖與掌心的距離（這裡簡化為邏輯判斷）
-                const dist = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-                isFist = dist < 0.1; 
-
-                particles.forEach(p => {
-                    p.update(indexTip.x * canvasElement.width, indexTip.y * canvasElement.height);
-                    p.draw();
-                });
-
-                if (isFist) {
-                    canvasCtx.fillStyle = "white";
-                    canvasCtx.font = "40px Arial";
-                    canvasCtx.textAlign = "center";
-                    canvasCtx.fillText("HAPPY NEW YEAR", canvasElement.width/2, canvasElement.height/2);
+        const imgData = tCtx.getImageData(0, 0, 800, 200).data;
+        for (let y = 0; y < 200; y += 5) {
+            for (let x = 0; x < 800; x += 5) {
+                if (imgData[(y * 800 + x) * 4 + 3] > 128) {
+                    textPoints.push({ x: (x - 400), y: (y - 100) });
                 }
             }
         }
+    }
 
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-        hands.onResults(onResults);
+    // 2. 粒子類別
+    class Particle {
+        constructor() {
+            this.x = Math.random() * 800;
+            this.y = Math.random() * 600;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.color = `hsl(${Math.random() * 50 + 160}, 100%, 70%)`; // 薄荷色系
+            this.size = Math.random() * 2 + 1;
+        }
 
-        const camera = new Camera(videoElement, {
-            onFrame: async () => { await hands.send({image: videoElement}); },
-            width: 640, height: 480
-        });
-        camera.start();
-    </script>
+        update(targetX, targetY, index) {
+            if (isFist) {
+                // 握拳：粒子移動到字體座標
+                let pt = textPoints[index % textPoints.length];
+                let tx = targetX + pt.x;
+                let ty = targetY + pt.y;
+                this.x += (tx - this.x) * 0.15;
+                this.y += (ty - this.y) * 0.15;
+            } else {
+                // 張手：隨機漂浮
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvasElement.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvasElement.height) this.vy *= -1;
+            }
+        }
+
+        draw() {
+            canvasCtx.fillStyle = this.color;
+            canvasCtx.beginPath();
+            canvasCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            canvasCtx.fill();
+        }
+    }
+
+    // 初始化
+    initTextPoints();
+    for (let i = 0; i < 600; i++) particles.push(new Particle());
+
+    function onResults(results) {
+        // 設定 Canvas 大小與視窗一致
+        canvasElement.width = canvasElement.clientWidth;
+        canvasElement.height = canvasElement.clientHeight;
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        // 繪製半透明黑色 背景感
+        canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
+        canvasCtx.fillRect(0,0, canvasElement.width, canvasElement.height);
+
+        if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+            const landmarks = results.multiHandLandmarks[0];
+            
+            // 判斷握拳 (食指指尖與掌心距離)
+            const d = Math.hypot(landmarks[8].x - landmarks[0].x, landmarks[8].y - landmarks[0].y);
+            isFist = d < 0.2; 
+
+            const centerX = (1 - landmarks[9].x) * canvasElement.width; // 鏡像處理
+            const centerY = landmarks[9].y * canvasElement.height;
+
+            particles.forEach((p, i) => {
+                p.update(centerX, centerY, i);
+                p.draw();
+            });
+        }
+        canvasCtx.restore();
+    }
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+    hands.onResults(onResults);
+
+    const camera = new Camera(videoElement, {
+        onFrame: async () => { await hands.send({image: videoElement}); },
+        width: 1280, height: 720
+    });
+    camera.start();
+</script>
+
 </body>
 </html>
