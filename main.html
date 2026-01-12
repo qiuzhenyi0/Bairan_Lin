@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Project Zero</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #000; }
+        .layout { display: flex; height: calc(100vh - 60px); }
+        
+        /* 手繪播放器懸浮位置 */
+        #music-container {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            width: 160px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        #music-container img { width: 100%; transition: 0.3s; }
+        #music-container img:hover { filter: brightness(1.2); }
+
+        /* 右側內容框架 */
+        #content-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bgm" loop>
+    <source src="Music/Music.mp3" type="audio/mpeg">
+</audio>
+
+<div class="header">
+    <div class="title">Project Zero / 零計畫</div>
+    <div class="numbers">Welcome</div>
+</div>
+
+<div class="layout">
+    <div class="sidebar">
+        <a href="home.html" target="main-iframe">自介</a>
+        <a href="diary.html" target="main-iframe">日記</a>
+        <a href="blog.html" target="main-iframe">部落格</a>
+        <a href="gallery.html" target="main-iframe">相簿</a>
+        <a href="collections.html" target="main-iframe">收藏</a>
+        <a href="fortune.html" target="main-iframe">幸運指數</a>
+        <a href="festival.html" target="main-iframe">節慶</a>
+
+        <div id="music-container" onclick="togglePlay()">
+            <img id="music-btn" src="Music/IMG_3116.png" alt="Play/Pause">
+        </div>
+
+        <div class="dog-container">
+            <img src="GIF_20251224164146204.gif" class="sidebar-dog">
+        </div>
+    </div>
+
+    <div class="content" style="padding:0;">
+        <iframe src="home.html" name="main-iframe" id="content-frame"></iframe>
+    </div>
+</div>
+
+<script>
+    const audio = document.getElementById('bgm');
+    const btn = document.getElementById('music-btn');
+    let playing = false;
+
+    function togglePlay() {
+        if (playing) {
+            audio.pause();
+            btn.src = "Music/IMG_3115.png"; // 播放鍵圖示
+        } else {
+            audio.play();
+            btn.src = "Music/IMG_3116.png"; // 暫停鍵圖示
+        }
+        playing = !playing;
+    }
+
+    // 進入頁面後自動播放（針對瀏覽器政策的點擊啟動）
+    window.addEventListener('click', () => {
+        if(!playing) togglePlay();
+    }, { once: true });
+</script>
+</body>
+</html>
