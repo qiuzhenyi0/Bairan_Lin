@@ -4,38 +4,18 @@
     <meta charset="UTF-8">
     <title>Project Zero Terminal</title>
     <style>
-        body {
-            background: #0d0d0d;
-            color: #00ffcc;
-            font-family: "JetBrains Mono", monospace;
-            padding: 40px;
-            font-size: 20px;
-        }
+        body { background: #0d0d0d; color: #00ffcc; font-family: "JetBrains Mono", monospace; padding: 40px; font-size: 20px; }
         #t { white-space: pre-line; }
-        a {
-            color: #00ffd5;
-            text-decoration: none;
-            border: 1px solid #00ffd5;
-            padding: 6px 16px;
-            display: inline-block;
-            margin-top: 20px;
-        }
+        a { color: #00ffd5; text-decoration: none; border: 1px solid #00ffd5; padding: 6px 16px; display: inline-block; margin-top: 20px; }
         a:hover { background: #00ffd5; color: #000; }
     </style>
 </head>
 <body>
-
 <pre id="t"></pre>
-<a id="enter" href="home.html" style="display:none;">ENTER</a>
+<a id="enter" href="main.html" style="display:none;">ENTER</a>
 
 <script>
-const text = [
-    "$ Project Zero initializing...",
-    "$ loading modules...",
-    "$ scanning memories...",
-    "$ compiling Zero System...",
-    "$ ready."
-];
+const text = ["$ Project Zero initializing...", "$ loading modules...", "$ scanning memories...", "$ compiling Zero System...", "$ ready."];
 let i = 0;
 function typeLine() {
     const t = document.getElementById("t");
@@ -49,6 +29,5 @@ function typeLine() {
 }
 typeLine();
 </script>
-
 </body>
 </html>
