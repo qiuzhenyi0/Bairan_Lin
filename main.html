@@ -1,133 +1,29 @@
-<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Project Zero</title>
-    <style>
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; background: #000; font-family: sans-serif;
-        }
+<style>
+    /* 手機版預設 (小比例) */
+    .sidebar { 
+        width: 75px; /* 從 85px 再縮小 */
+        flex-shrink: 0; 
+        background-color: #a3d9c9; 
+        display: flex; flex-direction: column; align-items: center; 
+        padding: 10px 0; z-index: 99;
+    }
 
-        /* 頂部 Header */
-        .header { 
-            height: 55px; background: #00F9C7; 
-            display: flex; align-items: center; padding: 0 15px; 
-            position: relative; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .header .title { font-weight: bold; color: #000; font-size: 18px; }
+    .sidebar a { 
+        width: 100%; padding: 10px 0; color: #333; 
+        text-decoration: none; font-weight: bold; 
+        font-size: 12px; /* 字體調小 */
+        text-align: center;
+    }
 
-        /* 主佈局：Flex 分配比例 */
-        .layout { 
-            display: flex; 
-            height: calc(100vh - 55px); 
-            width: 100%;
-        }
+    /* 播放器與狗狗也跟著縮小 */
+    #music-ui { width: 65px; margin-bottom: 5px; }
+    .dog-container { width: 35px; }
 
-        /* 側邊欄：手機版改窄，防止擠壓內容 */
-        .sidebar { 
-            width: 85px; /* 縮窄手機版側邊欄比例 */
-            flex-shrink: 0; 
-            background-color: #a3d9c9; 
-            display: flex; flex-direction: column; align-items: center; 
-            padding: 10px 0; z-index: 99;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar a { 
-            width: 100%; padding: 12px 0; color: #333; 
-            text-decoration: none; font-weight: bold; font-size: 13px; /* 縮小字體 */
-            text-align: center; border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        /* 右側內容區：給予最大空間 */
-        .content-area {
-            flex-grow: 1; 
-            position: relative;
-            background: #000;
-        }
-        iframe { width: 100%; height: 100%; border: none; display: block; }
-
-        /* 底部組合：播放器與小狗 */
-        .sidebar-bottom-group {
-            margin-top: auto; 
-            display: flex; flex-direction: column;
-            align-items: center; width: 100%; padding-bottom: 15px;
-        }
-        #music-ui { width: 75px; cursor: pointer; margin-bottom: 5px; }
-        #music-ui img { width: 100%; display: block; }
-        .dog-container { width: 40px; }
-        .dog-container img { width: 100%; display: block; }
-
-        /* --- 電腦版樣式適應 (寬度 > 768px) --- */
-        @media (min-width: 768px) {
-            .sidebar { width: 200px; } /* 電腦版恢復大比例 */
-            .sidebar a { font-size: 16px; padding: 15px 0; }
-            #music-ui { width: 140px; }
-            .dog-container { width: 70px; }
-            .header { height: 70px; padding: 0 30px; }
-            .layout { height: calc(100vh - 70px); }
-            .header .title { font-size: 24px; }
-        }
-    </style>
-</head>
-<body>
-    <audio id="bgm" loop preload="auto"><source src="Music/Music.mp3" type="audio/mpeg"></audio>
-    
-    <div class="header">
-        <div class="title">Project Zero / 零計畫</div>
-    </div>
-
-    <div class="layout">
-        <div class="sidebar">
-            <a href="home.html" target="content-frame">自介</a>
-            <a href="diary.html" target="content-frame">日記</a>
-            <a href="blog.html" target="content-frame">部落格</a>
-            <a href="gallery.html" target="content-frame">相簿</a>
-            <a href="collections.html" target="content-frame">收藏</a>
-            <a href="fortune.html" target="content-frame">幸運指數</a>
-            <a href="festival.html" target="content-frame">節慶</a>
-            
-            <div class="sidebar-bottom-group">
-                <div id="music-ui" onclick="togglePlay()">
-                    <img id="btn-img" src="Music/IMG_3115.png">
-                </div>
-                <div class="dog-container">
-                    <img src="GIF_20251224164146204.gif">
-                </div>
-            </div>
-        </div>
-
-        <div class="content-area">
-            <iframe src="home.html" name="content-frame"></iframe>
-        </div>
-    </div>
-
-    <script>
-        const audio = document.getElementById('bgm');
-        const img = document.getElementById('btn-img');
-        
-        function updateIcon() {
-            img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png";
-        }
-
-        function togglePlay() {
-            if (audio.paused) { audio.play().then(updateIcon); } 
-            else { audio.pause(); updateIcon(); }
-        }
-
-        window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('autoplay') === 'true') {
-                audio.play().then(updateIcon).catch(updateIcon);
-            }
-        };
-
-        // 點擊側邊欄啟動保險機制
-        document.querySelector('.sidebar').addEventListener('click', () => {
-            if (audio.paused && audio.currentTime === 0) { audio.play().then(updateIcon); }
-        }, { once: true });
-    </script>
-</body>
-</html>
+    /* 電腦版 (寬螢幕時自動放大) */
+    @media (min-width: 768px) {
+        .sidebar { width: 180px; }
+        .sidebar a { font-size: 16px; padding: 15px 0; }
+        #music-ui { width: 120px; }
+        .dog-container { width: 60px; }
+    }
+</style>
