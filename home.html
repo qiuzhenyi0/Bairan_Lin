@@ -4,98 +4,119 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #000; color: #fff; min-height: 100vh; margin: 0; padding: 30px; }
-        .content { max-width: 800px; margin: 0 auto; }
+        /* 確保背景填滿黑色，解決缺失問題 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #000 !important;
+            color: #fff;
+            min-height: 100vh;
+            font-family: sans-serif;
+            overflow-x: hidden;
+        }
+
+        .content-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: #00F9C7;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        /* 社交連結區塊 */
+        .social-module {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .social-icon {
+            color: #00F9C7;
+            text-decoration: none;
+            border: 1px solid #00F9C7;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .social-icon:hover {
+            background: #00F9C7;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 249, 199, 0.4);
+        }
+
+        .text-area {
+            background: rgba(26, 26, 26, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            border-left: 3px solid #00F9C7;
+        }
+
+        .text-area p {
+            margin: 5px 0;
+        }
+
+        /* 圖片展示區塊 */
+        .image-slider {
+            margin-top: 30px;
+        }
+        .slider-title {
+            color: #00F9C7;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .slides {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .slides img {
+            height: 150px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
     </style>
 </head>
 <body>
+    <div class="content-inner">
+        <h1>歡迎回來</h1>
+        
+        <div class="social-module">
+            <a href="https://www.instagram.com/qiuzhenyi0?igsh=MXYwdTJuMTh5cDN6MA%3D%3D&utm_source=qr" target="_blank" class="social-icon">Instagram</a>
+            <a href="https://www.facebook.com/share/1C6KdLZQHN/?mibextid=wwXIfr" target="_blank" class="social-icon">Facebook</a>
+            <a href="https://x.com/bairan_lin?s=21" target="_blank" class="social-icon">𝕏 (Twitter)</a>
+        </div>
 
-    <div class="content">
-    <h1>歡迎回來</h1>
-    
-    <div class="social-module">
-        <a href="https://www.instagram.com/qiuzhenyi0?igsh=MXYwdTJuMTh5cDN6MA%3D%3D&utm_source=qr" class="social-icon">IG</a>
-        <a href="https://www.facebook.com/share/1HJ12RoyFr/?mibextid=wwXIfr" class="social-icon">FB</a>
-        <a href="https://x.com/bairan_lin?s=21" class="social-icon">𝕏</a>
-    </div>
+        <div class="text-area">
+            <p>自介ᝰ✍︎</p>
+            <p>⌗玲㿟染 / Baïran Lin</p>
+            <p>⌗台灣 | INTJ-T</p>
+            <p>⌗Flourish/Zippo tricks玩家</p>
+            <p>⌗Python / HTML / C++ / JS</p>
+        </div>
 
-    <div class="text-area">
-        <p>自介ᝰ✍︎</p>
-        <p>⌗玲㿟染 / Baïran Lin</p>
-        <p>⌗台灣 | INTJ</p>
-        <p>⌗Flourish/Zippo tricks玩家</p>
-        <p>⌗Python/html/cpp/js</p>
-        <p>⌗INTJ-T</p>
-    </div>
+        <div class="text-area" style="border-left-color: #AFE2DE;">
+            <p><strong>光遇 Sky</strong></p>
+            <p>常駐林克 | 無 cp | 固玩監護 無雷</p>
+            <p style="font-style: italic; color: #888;">「自由只是你還未學習正確依附我時，暫時必要的累贅。」</p>
+        </div>
 
-    <div class="text-area sky-section">
-        <p><strong>光遇</strong></p>
-        <p>常駐林克</p>
-        <p>無 cp 固玩監護 無雷</p>
-        <p>自由只是你還未學習正確依附我時,暫時必要的累贅。<p>
-    </div>
-
-    <div class="calendar-container">
-        <div id="current-date-display">載入日期中...</div>
-        <textarea class="today-task">∠( ᐛ 」∠)＿</textarea>
-    </div>
-
-    <div class="image-slider">
-        <div class="slider-title">光遇工作室</div>
-        <div class="slides">
-            <img src="`folder/本月頭牌.png" alt="頭牌">
-            <img src="`folder/小祈杂货 已断.png" alt="小祈雜貨商副團長">
-            <img src="`folder/Untitled227_20251224040303.png" alt="圖片 3">
+        <div class="image-slider">
+            <div class="slider-title">光遇工作室</div>
+            <div class="slides">
+                <img src="`folder/本月頭牌.png" alt="頭牌">
+                <img src="`folder/小祈杂货 已断.png" alt="小祈雜貨">
+                <img src="`folder/Untitled227_20251224040303.png" alt="紀錄">
+            </div>
         </div>
     </div>
-
-    <div class="image-slider">
-        <div class="slider-title">分類收藏</div>
-        <div class="slides">
-            <img src="Sky/IMG_0146.png" alt="分類 1">
-            <img src="Sky/IMG_0318.jpeg" alt="分類 2">
-            <img src="Sky/IMG_0365.jpeg" alt="分類 3">
-            <img src="Sky/IMG_0446.jpeg" alt="分類 4">
-            <img src="Sky/IMG_0969.jpeg" alt="分類 5">
-            <img src="Sky/IMG_1228.jpeg" alt="分類 6">
-            <img src="Sky/IMG_1239.jpeg" alt="分類 7">
-            <img src="Sky/IMG_2234.jpeg" alt="分類 8">
-            <img src="Sky/IMG_2236.jpeg" alt="分類 9">
-            <img src="Sky/IMG_2241.jpeg" alt="分類 10">
-            <img src="Sky/IMG_2247.jpeg" alt="分類 11">
-            <img src="Sky/IMG_2253.jpeg" alt="分類 12">
-            <img src="Sky/IMG_2257.jpeg" alt="分類 13">
-        </div>
-        <div class="slider-controls">
-            <span>⬅️ 左右滑動觀看更多 ➡️</span>
-        </div>
-    </div>
-</div>
-
-<script>
-    function updateDate() {
-        const now = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        document.getElementById('current-date-display').innerText = "今天是：" + now.toLocaleDateString('zh-TW', options);
-    }
-    updateDate();
-/* 子頁面專用 CSS */
-html, body {
-    margin: 0;
-    padding: 0;
-    background-color: #000 !important; /* 強制背景為黑色 */
-    min-height: 100vh; /* 確保內容不夠時，背景依然是黑的 */
-    width: 100%;
-    color: white;
-}
-
-.content {
-    background-color: #000 !important;
-    padding: 20px;
-    box-sizing: border-box; /* 防止 padding 撐破寬度 */
-}
-
-</script>
-
 </body>
 </html>
