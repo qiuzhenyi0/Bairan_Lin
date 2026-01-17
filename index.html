@@ -11,23 +11,19 @@
     </style>
 </head>
 <body>
-<pre id="t"></pre>
-<a id="enter" href="main.html" style="display:none;">ENTER</a>
-
-<script>
-const text = ["$ Project Zero initializing...", "$ loading modules...", "$ scanning memories...", "$ compiling Zero System...", "$ ready."];
-let i = 0;
-function typeLine() {
-    const t = document.getElementById("t");
-    if (i < text.length) {
-        t.textContent += text[i] + "\n";
-        i++;
-        setTimeout(typeLine, 600);
-    } else {
-        document.getElementById("enter").style.display = "inline-block";
-    }
-}
-typeLine();
-</script>
+    <pre id="t"></pre>
+    <a id="enter" href="main.html" style="display:none;">ENTER</a>
+    <script>
+        const text = ["$ Project Zero initializing...", "$ loading modules...", "$ scanning memories...", "$ compiling Zero System...", "$ ready."];
+        let i = 0;
+        function typeLine() {
+            const t = document.getElementById("t");
+            if (i < text.length) {
+                t.textContent += text[i] + "\n"; i++;
+                setTimeout(typeLine, 600);
+            } else { document.getElementById("enter").style.display = "inline-block"; }
+        }
+        typeLine();
+    </script>
 </body>
 </html>
