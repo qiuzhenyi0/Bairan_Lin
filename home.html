@@ -75,6 +75,22 @@
         document.getElementById('current-date-display').innerText = "今天是：" + now.toLocaleDateString('zh-TW', options);
     }
     updateDate();
+/* 子頁面專用 CSS */
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #000 !important; /* 強制背景為黑色 */
+    min-height: 100vh; /* 確保內容不夠時，背景依然是黑的 */
+    width: 100%;
+    color: white;
+}
+
+.content {
+    background-color: #000 !important;
+    padding: 20px;
+    box-sizing: border-box; /* 防止 padding 撐破寬度 */
+}
+
 </script>
 
 </body>
