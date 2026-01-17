@@ -4,39 +4,98 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #000; color: #fff; min-height: 100vh; margin: 0; padding: 30px; }
-        .content { max-width: 800px; margin: 0 auto; }
+        /* 基礎背景與文字設定，確保填滿黑色區域 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #000 !important;
+            color: #fff;
+            min-height: 100vh;
+            font-family: sans-serif;
+        }
+
+        .content-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h2 {
+            color: #00F9C7; /* 主題色 */
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .intro-text {
+            color: #AFE2DE;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* 相簿網格佈局（預留給未來放入照片） */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            border-color: #00F9C7;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-item p {
+            padding: 10px;
+            margin: 0;
+            font-size: 14px;
+            color: #ccc;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <div class="content-inner">
+        <h2>相簿 Gallery</h2>
+        <p class="intro-text">放遊戲截圖、生活照片、靈感收集 ψ(｀∇´)ψ</p>
 
-<div class="header">
-    <div class="title">相簿 Gallery</div>
-    <div class="numbers">Images</div>
-</div>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="`folder/Untitled227_20251224040303.png" alt="圖片 1">
+                <p>光遇工作室紀錄</p>
+            </div>
 
-<div class="layout">
+            <div class="gallery-item">
+                <img src="Sky/IMG_0146.png" alt="圖片 2">
+                <p>Sky 收藏 01</p>
+            </div>
 
-    <div class="sidebar">
-    <a href="home.html">自介</a>
-    <a href="diary.html">日記</a>
-    <a href="blog.html">部落格</a>
-    <a href="gallery.html">相簿</a>
-    <a href="collections.html">收藏</a>
-    <a href="fortune.html">幸運指數</a>
+            <div class="gallery-item">
+                <img src="Sky/IMG_0318.jpeg" alt="圖片 3">
+                <p>Sky 收藏 02</p>
+            </div>
+            
+            </div>
 
-    <div id="pixelDog" class="dog-container">
-        <img src="GIF_20251224164146204.gif" alt="dog" class="sidebar-dog">
+        <div style="margin-top: 50px; text-align: center; color: #444; font-size: 12px;">
+            $ 影像模組載入完畢...
+        </div>
     </div>
-</div>
-
-
-    <div class="content">
-        <h2>相簿</h2>
-        <p>放遊戲截圖、生活照片、靈感收集ψ(｀∇´)ψ</p>
-    </div>
-
-</div>
-
 </body>
 </html>
