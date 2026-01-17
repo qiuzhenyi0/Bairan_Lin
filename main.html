@@ -9,27 +9,24 @@
         .layout { display: flex; height: calc(100vh - 60px); }
         .sidebar { 
             width: 200px; background-color: #a3d9c9; 
-            display: flex; flex-direction: column; align-items: center; 
-            padding: 20px 0;
+            display: flex; flex-direction: column; align-items: center; padding: 20px 0;
         }
         .sidebar a { width: 100%; padding: 12px 25px; color: #333; text-decoration: none; box-sizing: border-box; }
-        .sidebar a:hover { background: rgba(255,255,255,0.3); }
-
-        /* 解決重疊：將播放器推到底部 */
+        
         #music-ui { margin-top: auto; width: 150px; cursor: pointer; padding: 10px; }
         #music-ui img { width: 100%; display: block; }
         .dog-container { width: 60px; margin-bottom: 20px; }
-        .dog-container img { width: 100%; }
-
         iframe { flex-grow: 1; border: none; background: #000; }
     </style>
 </head>
 <body>
     <audio id="bgm" loop><source src="Music/Music.mp3" type="audio/mpeg"></audio>
+    
     <div class="header">
         <div class="title">Project Zero / 零計畫</div>
         <div class="numbers">Welcome</div>
     </div>
+
     <div class="layout">
         <div class="sidebar">
             <a href="home.html" target="content-frame">自介</a>
@@ -41,22 +38,56 @@
             <a href="festival.html" target="content-frame">節慶</a>
             
             <div id="music-ui" onclick="togglePlay()">
-                <img id="btn-img" src="Music/IMG_3115.png">
+                <img id="btn-img" src="Music/IMG_3116.png">
             </div>
-            <div class="dog-container"><img src="GIF_20251224164146204.gif"></div>
+            <div class="dog-container"><img src="GIF_20251224164146204.gif" style="width:100%;"></div>
         </div>
         <iframe src="home.html" name="content-frame"></iframe>
     </div>
+
     <script>
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
-        let playing = false;
+        
+        // 修正後的邏輯
+        // IMG_3115 = 播放鈕 (按了會開始播)
+        // IMG_3116 = 暫停鈕 (按了會停止播)
+        
         function togglePlay() {
-            if (playing) { audio.pause(); img.src = "Music/IMG_3115.png"; }
-            else { audio.play(); img.src = "Music/IMG_3116.png"; }
-            playing = !playing;
+            if (audio.paused) {
+                audio.play();
+                img.src = "Music/IMG_3116.png"; // 播放中，顯示暫停鈕
+            } else {
+                audio.pause();
+                img.src = "Music/IMG_3115.png"; // 暫停中，顯示播放鈕
+            }
         }
-        window.addEventListener('click', () => { if(!playing) togglePlay(); }, { once: true });
+
+        // 偵測網址是否有 autoplay 參數
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('autoplay') === 'true') {
+                // 嘗試立即播放
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        img.src = "Music/IMG_3116.png"; // 播放成功
+                    }).catch(error => {
+                        // 如果被瀏覽器阻擋，顯示播放鈕讓使用者點擊
+                        img.src = "Music/IMG_3115.png";
+                        console.log("Autoplay blocked, waiting for user interaction.");
+                    });
+                }
+            }
+        };
+
+        // 額外保險：點擊頁面任何地方若尚未播放則啟動
+        window.addEventListener('click', () => {
+            if (audio.paused && audio.currentTime === 0) {
+                togglePlay();
+            }
+        }, { once: true });
     </script>
 </body>
 </html>
