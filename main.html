@@ -2,17 +2,17 @@
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Zero</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* 保持你最穩定的佈局結構 */
         body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #000; }
         .layout { display: flex; height: calc(100vh - 60px); position: relative; }
 
-        /* 側邊欄：固定寬度防止手機端擠壓 */
         .sidebar { 
-            width: 120px; /* 稍微縮窄適應手機 */
-            min-width: 120px;
+            width: 140px; /* 固定寬度，防止手機端內容把導覽列擠扁 */
+            min-width: 140px; 
             background-color: #a3d9c9; 
             display: flex; 
             flex-direction: column; 
@@ -25,16 +25,15 @@
 
         .sidebar a { 
             width: 100%; 
-            padding: 12px 10px; 
+            padding: 12px 15px; 
             color: #333; 
             text-decoration: none; 
             box-sizing: border-box; 
             font-weight: bold;
-            font-size: 15px;
+            font-size: 16px;
             text-align: center;
         }
 
-        /* 底部組合：固定在側邊欄最下方 */
         .sidebar-bottom-group {
             margin-top: auto; 
             display: flex;
@@ -46,23 +45,22 @@
         }
 
         #music-ui { 
-            width: 100px; 
+            width: 110px; 
             cursor: pointer; 
             margin-bottom: 5px;
         }
         #music-ui img { width: 100%; display: block; }
 
         .dog-container { 
-            width: 50px; 
+            width: 60px; 
         }
         .dog-container img { width: 100%; display: block; }
 
-        /* iframe 內容區 */
         iframe { 
             flex-grow: 1; 
             border: none; 
             background: #000;
-            width: calc(100vw - 120px);
+            width: 100%; /* 這裡讓 iframe 自動填滿剩餘空間 */
             height: 100%;
         }
     </style>
@@ -87,7 +85,7 @@
             
             <div class="sidebar-bottom-group">
                 <div id="music-ui" onclick="togglePlay()">
-                    <img id="btn-img" src="Music/IMG_3115.png">
+                    <img id="btn-img" src="Music/IMG_3116.png">
                 </div>
                 <div class="dog-container">
                     <img src="GIF_20251224164146204.gif">
@@ -95,51 +93,39 @@
             </div>
         </div>
 
-        <iframe src="home.html" name="content-frame" id="content-iframe"></iframe>
+        <iframe src="home.html" name="content-frame"></iframe>
     </div>
 
     <script>
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
         
-        // 狀態更新函式：確保圖片正確
-        function updateIcon() {
-            if (audio.paused) {
-                img.src = "Music/IMG_3115.png"; // 暫停中顯示「播放鈕」
-            } else {
-                img.src = "Music/IMG_3116.png"; // 播放中顯示「暫停鈕」
-            }
-        }
-
+        // 修正後的邏輯：
+        // IMG_3116 是暫停符號 (播放時顯示)
+        // IMG_3115 是播放符號 (停止時顯示)
+        
         function togglePlay() {
             if (audio.paused) {
-                audio.play().then(updateIcon);
+                audio.play();
+                img.src = "Music/IMG_3116.png"; 
             } else {
                 audio.pause();
-                updateIcon();
+                img.src = "Music/IMG_3115.png"; 
             }
         }
 
-        // 核心邏輯：從 index.html 點 enter 跳轉過來時
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('autoplay') === 'true') {
-                // 延遲一小段時間確保資源加載，並嘗試自動播放
-                setTimeout(() => {
-                    audio.play().then(updateIcon).catch(e => {
-                        console.log("Autoplay failed, waiting for user.");
-                        updateIcon();
-                    });
-                }, 300);
+                audio.play().then(() => {
+                    // 自動播放成功，顯示暫停鈕
+                    img.src = "Music/IMG_3116.png";
+                }).catch(e => {
+                    // 自動播放被阻擋，顯示播放鈕
+                    img.src = "Music/IMG_3115.png";
+                });
             }
         };
-
-        // 行動端保險：只要點擊側邊欄任何地方也啟動音樂
-        document.querySelector('.sidebar').addEventListener('click', () => {
-            if (audio.paused && audio.currentTime === 0) {
-                audio.play().then(updateIcon);
-            }
-        }, { once: true });
     </script>
 </body>
 </html>
