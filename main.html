@@ -5,72 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Project Zero</title>
     <style>
-        /* 基礎設定 */
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; background: #000; font-family: sans-serif;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+        
+        /* Header 縮小字體 */
+        .header { height: 45px; background: #00F9C7; display: flex; align-items: center; padding: 0 12px; position: relative; z-index: 1000; }
+        .header .title { font-weight: bold; color: #000; font-size: 14px; flex-grow: 1; }
+        .welcome-text { font-size: 10px; opacity: 0.6; letter-spacing: 1px; }
 
-        /* 頂部 Header */
-        .header { 
-            height: 50px; background: #00F9C7; 
-            display: flex; align-items: center; padding: 0 15px; 
-            position: relative; z-index: 1000;
-        }
-        .header .title { font-weight: bold; color: #000; font-size: 16px; flex-grow: 1; }
-        .welcome-text { font-size: 12px; opacity: 0.6; }
+        .layout { display: flex; height: calc(100vh - 45px); width: 100%; }
 
-        /* 主佈局 */
-        .layout { display: flex; height: calc(100vh - 50px); width: 100%; }
+        /* 側邊欄：字體與寬度極小化 */
+        .sidebar { width: 70px; flex-shrink: 0; background-color: #a3d9c9; display: flex; flex-direction: column; align-items: center; padding: 8px 0; z-index: 99; }
+        .sidebar a { width: 100%; padding: 10px 0; color: #333; text-decoration: none; font-weight: bold; font-size: 11px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); }
 
-        /* 側邊欄 (手機版寬度 75px) */
-        .sidebar { 
-            width: 75px; flex-shrink: 0; 
-            background-color: #a3d9c9; 
-            display: flex; flex-direction: column; align-items: center; 
-            padding: 10px 0; z-index: 99;
-        }
-
-        .sidebar a { 
-            width: 100%; padding: 12px 0; color: #333; 
-            text-decoration: none; font-weight: bold; font-size: 12px; 
-            text-align: center;
-        }
-
-        /* 內容區 */
         .content-area { flex-grow: 1; position: relative; background: #000; }
         iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        /* 底部組合 (縮小比例) */
-        .sidebar-bottom-group {
-            margin-top: auto; display: flex; flex-direction: column;
-            align-items: center; width: 100%; padding-bottom: 15px;
-        }
-        #music-ui { width: 65px; cursor: pointer; margin-bottom: 5px; }
+        .sidebar-bottom-group { margin-top: auto; display: flex; flex-direction: column; align-items: center; width: 100%; padding-bottom: 12px; }
+        #music-ui { width: 60px; cursor: pointer; margin-bottom: 4px; }
         #music-ui img { width: 100%; display: block; }
-        .dog-container { width: 35px; }
+        .dog-container { width: 30px; }
         .dog-container img { width: 100%; display: block; }
 
-        /* --- 電腦版適應 --- */
         @media (min-width: 768px) {
-            .header { height: 65px; }
-            .header .title { font-size: 22px; }
+            .header { height: 60px; }
+            .header .title { font-size: 20px; }
             .sidebar { width: 180px; }
-            .sidebar a { font-size: 16px; padding: 15px 0; }
-            .layout { height: calc(100vh - 65px); }
-            #music-ui { width: 120px; }
-            .dog-container { width: 60px; }
+            .sidebar a { font-size: 15px; padding: 15px 0; }
+            .layout { height: calc(100vh - 60px); }
+            #music-ui { width: 110px; }
+            .dog-container { width: 55px; }
         }
     </style>
 </head>
 <body>
     <audio id="bgm" loop preload="auto"><source src="Music/Music.mp3" type="audio/mpeg"></audio>
-    
     <div class="header">
         <div class="title">Project Zero / 零計畫</div>
         <div class="welcome-text">Welcome</div>
     </div>
-
     <div class="layout">
         <div class="sidebar">
             <a href="home.html" target="content-frame">自介</a>
@@ -80,45 +53,23 @@
             <a href="collections.html" target="content-frame">收藏</a>
             <a href="fortune.html" target="content-frame">幸運指數</a>
             <a href="festival.html" target="content-frame">節慶</a>
-            
             <div class="sidebar-bottom-group">
-                <div id="music-ui" onclick="togglePlay()">
-                    <img id="btn-img" src="Music/IMG_3115.png">
-                </div>
-                <div class="dog-container">
-                    <img src="GIF_20251224164146204.gif">
-                </div>
+                <div id="music-ui" onclick="togglePlay()"><img id="btn-img" src="Music/IMG_3115.png"></div>
+                <div class="dog-container"><img src="GIF_20251224164146204.gif"></div>
             </div>
         </div>
-
-        <div class="content-area">
-            <iframe src="home.html" name="content-frame"></iframe>
-        </div>
+        <div class="content-area"><iframe src="home.html" name="content-frame"></iframe></div>
     </div>
-
     <script>
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
-        
-        function updateIcon() {
-            img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png";
-        }
-
-        function togglePlay() {
-            if (audio.paused) { audio.play().then(updateIcon); } 
-            else { audio.pause(); updateIcon(); }
-        }
-
+        function updateIcon() { img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png"; }
+        function togglePlay() { if (audio.paused) { audio.play().then(updateIcon); } else { audio.pause(); updateIcon(); } }
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('autoplay') === 'true') {
-                audio.play().then(updateIcon).catch(updateIcon);
-            }
+            if (urlParams.get('autoplay') === 'true') { audio.play().then(updateIcon).catch(updateIcon); }
         };
-
-        document.querySelector('.sidebar').addEventListener('click', () => {
-            if (audio.paused && audio.currentTime === 0) { audio.play().then(updateIcon); }
-        }, { once: true });
+        document.querySelector('.sidebar').addEventListener('click', () => { if (audio.paused && audio.currentTime === 0) { audio.play().then(updateIcon); } }, { once: true });
     </script>
 </body>
 </html>
