@@ -2,81 +2,62 @@
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Project Zero</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #000; }
-        .header { height: 60px; z-index: 1001; position: relative; }
+        /* 基礎清除 */
+        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; background: #000; font-family: sans-serif; }
         
-        .layout { 
-            display: flex; 
-            height: calc(100vh - 60px); 
-            position: relative; 
+        /* 頂部 Header */
+        .header { 
+            height: 60px; background: #00F9C7; display: flex; align-items: center; 
+            padding: 0 15px; justify-content: space-between; position: relative; z-index: 100;
         }
 
-        /* 側邊欄 */
+        /* 主佈局：強制定寬 */
+        .layout { display: flex; height: calc(100vh - 60px); width: 100vw; position: relative; }
+
+        /* 左側側邊欄：固定 100px 寬度，不被擠壓 */
         .sidebar { 
-            width: 120px; /* 縮小寬度以適應手機 */
-            background-color: #a3d9c9; 
-            display: flex; 
-            flex-direction: column; 
-            padding-top: 20px;
-            z-index: 10;
-            position: relative;
+            width: 100px; min-width: 100px; background-color: #a3d9c9; 
+            display: flex; flex-direction: column; z-index: 50;
         }
-
         .sidebar a { 
-            width: 100%; padding: 10px 15px; 
-            color: #333; text-decoration: none; 
-            font-weight: bold; font-size: 14px;
+            padding: 12px 10px; color: #333; text-decoration: none; 
+            font-size: 14px; font-weight: bold; text-align: center;
         }
 
-        /* 播放器與小狗組合：改用絕對定位固定在左下角，確保不被覆蓋 */
+        /* 底部 UI：使用絕對定位，確保浮在所有東西上面 */
         .fixed-bottom-ui {
             position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 120px; /* 與 sidebar 同寬 */
+            bottom: 15px;
+            left: 5px;
+            width: 90px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 2000; /* 極高層級，防止被 iframe 內容遮擋 */
-            pointer-events: none; /* 防止干擾下方點擊，但內部元件會開啟 */
+            z-index: 999; /* 最高層級 */
         }
 
-        #music-ui { 
-            width: 100px; 
-            cursor: pointer; 
-            pointer-events: auto; /* 開啟點擊 */
-            margin-bottom: -5px;
-        }
+        #music-ui { width: 85px; cursor: pointer; margin-bottom: 5px; }
         #music-ui img { width: 100%; display: block; }
 
-        .dog-container { 
-            width: 50px; 
-            pointer-events: none;
-        }
+        .dog-container { width: 45px; }
         .dog-container img { width: 100%; display: block; }
 
-        /* 右側 iframe */
-        iframe { 
-            flex-grow: 1; 
-            border: none; 
-            background: #000; 
-            position: relative;
-            z-index: 1;
+        /* 右側 iframe：寬度自動計算，並設定 z-index 較低 */
+        #content-frame { 
+            flex: 1; border: none; background: #000; 
+            z-index: 10; width: calc(100vw - 100px);
         }
     </style>
 </head>
 <body>
-    <audio id="bgm" loop preload="auto">
-        <source src="Music/Music.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgm" loop preload="auto"><source src="Music/Music.mp3" type="audio/mpeg"></audio>
     
     <div class="header">
-        <div class="title">Project Zero / 零計畫</div>
-        <div class="numbers">Welcome</div>
+        <div style="font-weight: bold;">Project Zero / 零計畫</div>
+        <div style="font-size: 12px; opacity: 0.7;">Welcome</div>
     </div>
 
     <div class="layout">
@@ -99,49 +80,46 @@
             </div>
         </div>
 
-        <iframe src="home.html" name="content-frame" id="content-iframe"></iframe>
+        <iframe src="home.html" name="content-frame" id="content-frame"></iframe>
     </div>
 
     <script>
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
         
-        // 修正後的邏輯：IMG_3115=播放鈕, IMG_3116=暫停鈕
         function togglePlay() {
             if (audio.paused) {
                 audio.play();
-                img.src = "Music/IMG_3116.png"; 
+                img.src = "Music/IMG_3116.png"; // 播放中顯示暫停鈕
             } else {
                 audio.pause();
-                img.src = "Music/IMG_3115.png"; 
+                img.src = "Music/IMG_3115.png"; // 暫停中顯示播放鈕
             }
         }
 
-        // 針對行動裝置的啟動修正
-        function startMusic() {
+        // 強制進入播放邏輯
+        function initMusic() {
             audio.play().then(() => {
                 img.src = "Music/IMG_3116.png";
-                console.log("Music started");
-            }).catch(e => {
+            }).catch(() => {
                 img.src = "Music/IMG_3115.png";
-                console.log("Playback interaction needed");
             });
         }
 
-        // 監聽來自 index.html 的 autoplay 參數
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('autoplay') === 'true') {
-                startMusic();
+                initMusic();
             }
         };
 
-        // 保險機制：使用者只要點擊頁面任何地方，就嘗試啟動音樂
-        document.body.addEventListener('click', () => {
+        // 解決手機點擊 iframe 不會觸發父頁面音樂的問題
+        // 在手機上，使用者只要碰到側邊欄或 header 任何地方就啟動音樂
+        document.addEventListener('click', function(e) {
             if (audio.paused && audio.currentTime === 0) {
-                startMusic();
+                initMusic();
             }
-        }, { once: true });
+        }, { once: false });
     </script>
 </body>
 </html>
