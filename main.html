@@ -7,15 +7,54 @@
     <style>
         body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #000; }
         .layout { display: flex; height: calc(100vh - 60px); }
+
+        /* 側邊欄佈局修正 */
         .sidebar { 
-            width: 200px; background-color: #a3d9c9; 
-            display: flex; flex-direction: column; align-items: center; padding: 20px 0;
+            width: 200px; 
+            background-color: #a3d9c9; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px 0;
+            box-sizing: border-box;
         }
-        .sidebar a { width: 100%; padding: 12px 25px; color: #333; text-decoration: none; box-sizing: border-box; }
-        
-        #music-ui { margin-top: auto; width: 150px; cursor: pointer; padding: 10px; }
+
+        .sidebar a { 
+            width: 100%; 
+            padding: 12px 25px; 
+            color: #333; 
+            text-decoration: none; 
+            box-sizing: border-box; 
+            font-weight: bold;
+        }
+        .sidebar a:hover { background: rgba(255,255,255,0.3); }
+
+        /* 底部組合容器：將播放器與小狗包在一起 */
+        .sidebar-bottom-group {
+            margin-top: auto; /* 關鍵：這會把整個群組推到底部 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding-bottom: 10px;
+        }
+
+        /* 播放器樣式 */
+        #music-ui { 
+            width: 140px; 
+            cursor: pointer; 
+            transition: transform 0.2s;
+            margin-bottom: -10px; /* 稍微縮小與小狗的間距，讓感官更緊湊 */
+        }
         #music-ui img { width: 100%; display: block; }
-        .dog-container { width: 60px; margin-bottom: 20px; }
+        #music-ui:hover { transform: scale(1.05); }
+
+        /* 小狗 GIF 樣式 */
+        .dog-container { 
+            width: 80px; 
+        }
+        .dog-container img { width: 100%; display: block; }
+
         iframe { flex-grow: 1; border: none; background: #000; }
     </style>
 </head>
@@ -37,12 +76,17 @@
             <a href="fortune.html" target="content-frame">幸運指數</a>
             <a href="festival.html" target="content-frame">節慶</a>
             
-            <div id="music-ui" onclick="togglePlay()">
-                <img id="btn-img" src="Music/IMG_3116.png">
+            <div class="sidebar-bottom-group">
+                <div id="music-ui" onclick="togglePlay()">
+                    <img id="btn-img" src="Music/IMG_3116.png">
+                </div>
+                <div class="dog-container">
+                    <img src="GIF_20251224164146204.gif">
+                </div>
             </div>
-            <div class="dog-container"><img src="GIF_20251224164146204.gif" style="width:100%;"></div>
         </div>
-        <iframe src="home.html" name="content-frame"></iframe>
+
+        <iframe src="home.html" name="content-frame" id="content-iframe"></iframe>
     </div>
 
     <script>
@@ -50,39 +94,32 @@
         const img = document.getElementById('btn-img');
         
         // 修正後的邏輯
-        // IMG_3115 = 播放鈕 (按了會開始播)
-        // IMG_3116 = 暫停鈕 (按了會停止播)
+        // IMG_3115 = 播放鈕 (暫停時顯示)
+        // IMG_3116 = 暫停鈕 (播放時顯示)
         
         function togglePlay() {
             if (audio.paused) {
                 audio.play();
-                img.src = "Music/IMG_3116.png"; // 播放中，顯示暫停鈕
+                img.src = "Music/IMG_3116.png"; 
             } else {
                 audio.pause();
-                img.src = "Music/IMG_3115.png"; // 暫停中，顯示播放鈕
+                img.src = "Music/IMG_3115.png"; 
             }
         }
 
-        // 偵測網址是否有 autoplay 參數
+        // 自動播放邏輯
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('autoplay') === 'true') {
-                // 嘗試立即播放
-                const playPromise = audio.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        img.src = "Music/IMG_3116.png"; // 播放成功
-                    }).catch(error => {
-                        // 如果被瀏覽器阻擋，顯示播放鈕讓使用者點擊
-                        img.src = "Music/IMG_3115.png";
-                        console.log("Autoplay blocked, waiting for user interaction.");
-                    });
-                }
+                audio.play().then(() => {
+                    img.src = "Music/IMG_3116.png";
+                }).catch(e => {
+                    img.src = "Music/IMG_3115.png"; // 被阻擋則顯示播放鈕
+                });
             }
         };
 
-        // 額外保險：點擊頁面任何地方若尚未播放則啟動
+        // 點擊頁面任何地方啟動（保險機制）
         window.addEventListener('click', () => {
             if (audio.paused && audio.currentTime === 0) {
                 togglePlay();
