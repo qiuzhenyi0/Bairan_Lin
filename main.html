@@ -4,51 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Project Zero</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        /* 基礎清除 */
-        body, html { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; background: #000; font-family: sans-serif; }
-        
-        /* 頂部 Header */
-        .header { 
-            height: 60px; background: #00F9C7; display: flex; align-items: center; 
-            padding: 0 15px; justify-content: space-between; position: relative; z-index: 100;
-        }
+        body, html { margin: 0; padding: 0; height: 100vh; overflow: hidden; background: #000; }
+        .layout { display: flex; height: calc(100vh - 60px); position: relative; }
 
-        /* 主佈局：強制定寬 */
-        .layout { display: flex; height: calc(100vh - 60px); width: 100vw; position: relative; }
-
-        /* 左側側邊欄：固定 100px 寬度，不被擠壓 */
+        /* 側邊欄：固定寬度防止手機端擠壓 */
         .sidebar { 
-            width: 100px; min-width: 100px; background-color: #a3d9c9; 
-            display: flex; flex-direction: column; z-index: 50;
-        }
-        .sidebar a { 
-            padding: 12px 10px; color: #333; text-decoration: none; 
-            font-size: 14px; font-weight: bold; text-align: center;
+            width: 120px; /* 稍微縮窄適應手機 */
+            min-width: 120px;
+            background-color: #a3d9c9; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px 0;
+            box-sizing: border-box;
+            z-index: 999; 
+            position: relative;
         }
 
-        /* 底部 UI：使用絕對定位，確保浮在所有東西上面 */
-        .fixed-bottom-ui {
-            position: absolute;
-            bottom: 15px;
-            left: 5px;
-            width: 90px;
+        .sidebar a { 
+            width: 100%; 
+            padding: 12px 10px; 
+            color: #333; 
+            text-decoration: none; 
+            box-sizing: border-box; 
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        /* 底部組合：固定在側邊欄最下方 */
+        .sidebar-bottom-group {
+            margin-top: auto; 
             display: flex;
             flex-direction: column;
             align-items: center;
-            z-index: 999; /* 最高層級 */
+            width: 100%;
+            padding-bottom: 20px;
+            background-color: #a3d9c9;
         }
 
-        #music-ui { width: 85px; cursor: pointer; margin-bottom: 5px; }
+        #music-ui { 
+            width: 100px; 
+            cursor: pointer; 
+            margin-bottom: 5px;
+        }
         #music-ui img { width: 100%; display: block; }
 
-        .dog-container { width: 45px; }
+        .dog-container { 
+            width: 50px; 
+        }
         .dog-container img { width: 100%; display: block; }
 
-        /* 右側 iframe：寬度自動計算，並設定 z-index 較低 */
-        #content-frame { 
-            flex: 1; border: none; background: #000; 
-            z-index: 10; width: calc(100vw - 100px);
+        /* iframe 內容區 */
+        iframe { 
+            flex-grow: 1; 
+            border: none; 
+            background: #000;
+            width: calc(100vw - 120px);
+            height: 100%;
         }
     </style>
 </head>
@@ -56,8 +71,8 @@
     <audio id="bgm" loop preload="auto"><source src="Music/Music.mp3" type="audio/mpeg"></audio>
     
     <div class="header">
-        <div style="font-weight: bold;">Project Zero / 零計畫</div>
-        <div style="font-size: 12px; opacity: 0.7;">Welcome</div>
+        <div class="title">Project Zero / 零計畫</div>
+        <div class="numbers">Welcome</div>
     </div>
 
     <div class="layout">
@@ -69,57 +84,62 @@
             <a href="collections.html" target="content-frame">收藏</a>
             <a href="fortune.html" target="content-frame">幸運指數</a>
             <a href="festival.html" target="content-frame">節慶</a>
+            
+            <div class="sidebar-bottom-group">
+                <div id="music-ui" onclick="togglePlay()">
+                    <img id="btn-img" src="Music/IMG_3115.png">
+                </div>
+                <div class="dog-container">
+                    <img src="GIF_20251224164146204.gif">
+                </div>
+            </div>
         </div>
 
-        <div class="fixed-bottom-ui">
-            <div id="music-ui" onclick="togglePlay()">
-                <img id="btn-img" src="Music/IMG_3116.png">
-            </div>
-            <div class="dog-container">
-                <img src="GIF_20251224164146204.gif">
-            </div>
-        </div>
-
-        <iframe src="home.html" name="content-frame" id="content-frame"></iframe>
+        <iframe src="home.html" name="content-frame" id="content-iframe"></iframe>
     </div>
 
     <script>
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
         
-        function togglePlay() {
+        // 狀態更新函式：確保圖片正確
+        function updateIcon() {
             if (audio.paused) {
-                audio.play();
-                img.src = "Music/IMG_3116.png"; // 播放中顯示暫停鈕
+                img.src = "Music/IMG_3115.png"; // 暫停中顯示「播放鈕」
             } else {
-                audio.pause();
-                img.src = "Music/IMG_3115.png"; // 暫停中顯示播放鈕
+                img.src = "Music/IMG_3116.png"; // 播放中顯示「暫停鈕」
             }
         }
 
-        // 強制進入播放邏輯
-        function initMusic() {
-            audio.play().then(() => {
-                img.src = "Music/IMG_3116.png";
-            }).catch(() => {
-                img.src = "Music/IMG_3115.png";
-            });
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play().then(updateIcon);
+            } else {
+                audio.pause();
+                updateIcon();
+            }
         }
 
+        // 核心邏輯：從 index.html 點 enter 跳轉過來時
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('autoplay') === 'true') {
-                initMusic();
+                // 延遲一小段時間確保資源加載，並嘗試自動播放
+                setTimeout(() => {
+                    audio.play().then(updateIcon).catch(e => {
+                        console.log("Autoplay failed, waiting for user.");
+                        updateIcon();
+                    });
+                }, 300);
             }
         };
 
-        // 解決手機點擊 iframe 不會觸發父頁面音樂的問題
-        // 在手機上，使用者只要碰到側邊欄或 header 任何地方就啟動音樂
-        document.addEventListener('click', function(e) {
+        // 行動端保險：只要點擊側邊欄任何地方也啟動音樂
+        document.querySelector('.sidebar').addEventListener('click', () => {
             if (audio.paused && audio.currentTime === 0) {
-                initMusic();
+                audio.play().then(updateIcon);
             }
-        }, { once: false });
+        }, { once: true });
     </script>
 </body>
 </html>
