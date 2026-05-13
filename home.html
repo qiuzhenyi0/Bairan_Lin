@@ -1,37 +1,89 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 12px; }
-        
-        h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
 
-        /* 按鈕群組：字體更小 */
-        .button-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
-        .btn { 
-            padding: 5px 8px; border: 1px solid rgba(0, 249, 199, 0.5); 
-            color: #00F9C7; text-decoration: none; font-size: 10px; 
-            border-radius: 3px; min-width: 60px; text-align: center;
-            background: rgba(0, 249, 199, 0.05);
-        }
+```
+    h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
 
-        /* 卡片內容：極小化字體 */
-        .card { 
-            border: 1px solid rgba(0, 249, 199, 0.2); border-radius: 6px; 
-            padding: 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); 
-        }
-        .card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
-        .card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
+    /* 按鈕群組：字體更小 */
+    .button-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+    .btn { 
+        padding: 5px 8px; border: 1px solid rgba(0, 249, 199, 0.5); 
+        color: #00F9C7; text-decoration: none; font-size: 10px; 
+        border-radius: 3px; min-width: 60px; text-align: center;
+        background: rgba(0, 249, 199, 0.05);
+    }
 
-        /* 圖片網格縮小 */
-        .image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
-        
-        /* 滾動條美化 (隱藏) */
-        .image-grid::-webkit-scrollbar { display: none; }
-    </style>
+    /* 卡片內容：極小化字體 */
+    .card { 
+        border: 1px solid rgba(0, 249, 199, 0.2); border-radius: 6px; 
+        padding: 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); 
+    }
+    .card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
+    .card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
+
+    /* 圖片網格縮小 */
+    .image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+    .image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+    
+    /* 滾動條美化 (隱藏) */
+    .image-grid::-webkit-scrollbar { display: none; }
+
+    /* 可展開按鈕樣式 */
+    .expandable-btn {
+        background: rgba(0, 249, 199, 0.05);
+        border: 1px solid rgba(0, 249, 199, 0.5);
+        color: #00F9C7;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        width: 100%;
+        text-align: left;
+        transition: all 0.3s ease;
+    }
+    
+    .expandable-btn:hover {
+        background: rgba(0, 249, 199, 0.15);
+        transform: translateX(4px);
+    }
+    
+    .expandable-content {
+        display: none;
+        background: rgba(0, 249, 199, 0.05);
+        border-left: 3px solid #00F9C7;
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 0 6px 6px 0;
+        font-size: 11px;
+        line-height: 1.6;
+        color: #bbb;
+    }
+    
+    .expandable-content.active {
+        display: block;
+    }
+    
+    .expandable-content a {
+        color: #00F9C7;
+        text-decoration: none;
+        font-weight: bold;
+        word-break: break-all;
+    }
+    
+    .expandable-content a:hover {
+        text-decoration: underline;
+    }
+</style>
+```
+
 </head>
 <body>
     <h2>歡迎回來</h2>
@@ -47,37 +99,85 @@
     </a>
 </div>
 
-    <div class="card">
-        <div class="card-title">自介 </div>
-        <div class="card-text">
-            ⌗ 玲㿟染 / Bairan Lin<br>
-            ⌗ 台灣 | INTJ-T<br>
-            ⌗ 忌色,毒話題、沒有邊界感<br>
-            ⌗ Flourish / Zippo tricks 玩家<br>
-            ⌗ Python / HTML / C++ / JS
-            ⌗ 無性戀
-            ⌗ 夢想大學：成大資工、政大資工
-        </div>
+```
+<div class="card">
+    <div class="card-title">自介 </div>
+    <div class="card-text">
+        ⌗ 玲㿟染 / Bairan Lin<br>
+        ⌗ 台灣 | INTJ-T<br>
+        ⌗ 忌色,毒話題、沒有邊界感<br>
+        ⌗ Flourish / Zippo tricks 玩家<br>
+        ⌗ Python / HTML / C++ / JS<br>
+        ⌗ 無性戀<br>
+        ⌗ 夢想大學：成大資工、政大資工
     </div>
+</div>
 
-    <div class="card">
-        <div class="card-title">光遇 Sky</div>
-        <div class="card-text">
-            常駐林克長髮 | 無 cp 固玩監護 無雷<br>
-            淡遊小氪,雙號
-            「自由只是你還未學習正確依附我時，暫時必要的累贅。」
-        </div>
+<div class="card">
+    <div class="card-title">光遇 Sky</div>
+    <div class="card-text">
+        常駐林克長髮 | 無 cp 固玩監護 無雷<br>
+        淡遊小氪,雙號<br>
+        「自由只是你還未學習正確依附我時，暫時必要的累贅。」
     </div>
+</div>
 
-    <div class="card">
-        <div class="card-title">光遇工作室</div>
-        <div class="card-title">以下自介卡皆由各團團長買斷製作,請勿抄襲,借鑑,盜圖，</div>
-         <div class="card-title">——————————————————————𖤐</div>
-        <div class="image-grid">
-            <img src="`folder/琉璃.png" alt="小祈雜貨商">
-            <img src="`folder/𝑰.𝑷.𝑭 𝑨𝒔𝒚𝒍𝒖𝒎自介｜未斷.png" alt="">
-            <img src="`folder/IMG_1759.png" alt="默認頭像">
-        </div>
+<div class="card">
+    <div class="card-title">光遇工作室</div>
+    <div class="card-title">以下自介卡皆由各團團長買斷製作,請勿抄襲,借鑑,盜圖，</div>
+     <div class="card-title">——————————————————————𖤐</div>
+    <div class="image-grid">
+        <img src="`folder/琉璃.png" alt="小祈雜貨商">
+        <img src="`folder/𝑰.𝑷.𝑭 𝑨𝒔𝒚𝒍𝒖𝒎自介｜未斷.png" alt="">
+        <img src="`folder/IMG_1759.png" alt="默認頭像">
     </div>
+</div>
+
+<button class="expandable-btn" onclick="toggleContent(this)">▸ AZR Systems</button>
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
+    <div style="margin-bottom: 10px;">AZR Systems | 你的創意實現廠牌
+設計 × 開發 × 代製 × 多多遊戲陪陪
+無論是美編卡面、客製網頁,小遊戲和機器人還是文件代做
+我們用心打造,精確訂製
+為您提供熱門遊戲陪玩
+有想法？找 AZR
+準備好改變了嗎？
+                                             [⠋ Loading...](https://discord.gg/zf95kurcet)</div>
+    <div>🔗 <a href="https://discord.gg/zf95kurcet" target="_blank">加入伺服器</a></div>
+</div>
+
+<button class="expandable-btn" onclick="toggleContent(this)">▸ 伺服器 #2</button>
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
+    <div style="margin-bottom: 10px;">溫暖友善的交流社群，提供角色養成討論、副本攻略與創意分享的平台。</div>
+    <div>🔗 <a href="https://discord.gg/CCannzKcbh" target="_blank">加入伺服器</a></div>
+</div>
+
+<button class="expandable-btn" onclick="toggleContent(this)">▸ 伺服器 #3</button>
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
+    <div style="margin-bottom: 10px;">專業玩家社群，聚集資深光遇愛好者，討論遊戲機制、活動攻略與專業心得。</div>
+    <div>🔗 <a href="https://discord.gg/duUtqMeUCX" target="_blank">加入伺服器</a></div>
+</div>
+
+<button class="expandable-btn" onclick="toggleContent(this)">▸ 伺服器 #4</button>
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
+    <div style="margin-bottom: 10px;">創意工作室伺服器，專注於自介卡設計、視覺創作與社群藝術交流分享。</div>
+    <div>🔗 <a href="https://discord.gg/MwtFd5Kbzp" target="_blank">加入伺服器</a></div>
+</div>
+
+<script>
+    function toggleContent(button) {
+        const content = button.nextElementSibling;
+        content.classList.toggle('active');
+        button.textContent = button.textContent.includes('▸') ? 
+            button.textContent.replace('▸', '▾') : 
+            button.textContent.replace('▾', '▸');
+    }
+</script>
+```
+
 </body>
 </html>
