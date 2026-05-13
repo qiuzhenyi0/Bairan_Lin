@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
@@ -8,113 +7,147 @@
     <style>
         body, html { margin: 0; padding: 0; background: #000; overflow: hidden; height: 100vh; width: 100%; }
         #output_canvas { width: 100%; height: 100%; object-fit: contain; }
-        .festival-ui { position: absolute; top: 20px; left: 20px; color: #00F9C7; z-index: 10; font-family: sans-serif; pointer-events: none; }
+        .festival-ui { position: absolute; top: 20px; left: 20px; color: #FF69B4; z-index: 10; font-family: sans-serif; pointer-events: none; text-shadow: 0 0 5px #000; }
     </style>
 </head>
 <body>
     <div class="festival-ui">
         <h2>🎂 Birthday Celebration 🎂</h2>
-        <p>✊ 握拳：粒子匯聚成字 / 🖐️ 張手：繞手散開</p>
+        <p>✊ 握拳：聚集祝福 / 🖐️ 張手：散播歡樂</p>
     </div>
     <video id="input_video" style="display:none;" playsinline></video>
     <canvas id="output_canvas"></canvas>
 
-```
 <script>
     const videoElement = document.getElementById('input_video');
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
+    
+    // 增加粒子數量到 1200，讓蛋糕和文字更清楚
     let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
+    const PARTICLE_COUNT = 1200; 
 
     function initText() {
         const tCanvas = document.createElement('canvas');
         const tCtx = tCanvas.getContext('2d');
-        tCanvas.width = 1000; 
-        tCanvas.height = 250;
-        tCtx.fillStyle = "white"; 
-        tCtx.font = "bold 60px Arial";
-        tCtx.textAlign = "center"; 
-        tCtx.fillText("HAPPY BIRTHDAY", 500, 70);
-        tCtx.fillText("TO ME", 500, 130);
-        tCtx.font = "70px Arial";
-        tCtx.fillText("🍰", 500, 200);
+        tCanvas.width = 1000; tCanvas.height = 400;
         
-        const data = tCtx.getImageData(0, 0, 1000, 250).data;
-        for (let y = 0; y < 250; y += 3) {
-            for (let x = 0; x < 1000; x += 3) {
-                if (data[(y * 1000 + x) * 4 + 3] > 128) {
-                    textPoints.push({ x: x - 500, y: y - 125 });
+        tCtx.fillStyle = "white";
+        tCtx.textAlign = "center"; 
+        
+        // 繪製文字
+        tCtx.font = "bold 70px Arial";
+        tCtx.fillText("HAPPY BIRTHDAY", 500, 100);
+        tCtx.fillText("TO ME", 500, 180);
+        
+        // 繪製蛋糕 Emoji
+        tCtx.font = "120px Arial";
+        tCtx.fillText("🍰", 500, 320);
+
+        const data = tCtx.getImageData(0, 0, 1000, 400).data;
+        textPoints = [];
+        // 採樣點位
+        for (let y = 0; y < 400; y += 4) {
+            for (let x = 0; x < 1000; x += 4) {
+                // 只要透明度大於 100 就當作目標點
+                if (data[(y * 1000 + x) * 4 + 3] > 100) {
+                    textPoints.push({ x: x - 500, y: y - 200 });
                 }
             }
         }
     }
 
     class Particle {
-        constructor() {
-            this.x = Math.random() * 800; 
-            this.y = Math.random() * 600;
-            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
-            this.hue = Math.random()*40+160; 
+        constructor(id) {
+            this.id = id; // 給每個粒子一個 ID，避免使用 indexOf
+            this.x = Math.random() * window.innerWidth;
+            this.y = Math.random() * window.innerHeight;
+            this.v = { x: (Math.random()-0.5)*6, y: (Math.random()-0.5)*6 };
+            this.hue = Math.random()*60 + 330; // 粉紅色系
             this.bri = 50;
         }
         update() {
             if (isFist && textPoints.length > 0) {
-                let pt = textPoints[particles.indexOf(this) % textPoints.length];
+                // 使用取模運算分配目標點
+                let pt = textPoints[this.id % textPoints.length];
                 let tx = currentHand.x * canvasElement.width + pt.x;
                 let ty = currentHand.y * canvasElement.height + pt.y;
-                this.x += (tx - this.x) * 0.22; 
-                this.y += (ty - this.y) * 0.22;
-                this.bri = Math.random()*40+60;
+                
+                // 緩動跟隨
+                this.x += (tx - this.x) * 0.15;
+                this.y += (ty - this.y) * 0.15;
+                this.bri = 70 + Math.random()*30;
             } else {
-                this.x += this.v.x; 
+                // 自由漂浮
+                this.x += this.v.x;
                 this.y += this.v.y;
+                
+                // 邊界反彈
+                if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
+                if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
+                
+                // 繞著手移動的引力效果
                 let dx = this.x - (currentHand.x * canvasElement.width);
                 let dy = this.y - (currentHand.y * canvasElement.height);
-                if (Math.hypot(dx, dy) > 350) { 
-                    this.v.x -= dx*0.015; 
-                    this.v.y -= dy*0.015; 
+                let dist = Math.hypot(dx, dy);
+                if (dist > 300) {
+                    this.v.x -= dx * 0.001;
+                    this.v.y -= dy * 0.001;
                 }
                 this.bri = 50;
-                if(this.x<0 || this.x>canvasElement.width) this.v.x*=-1;
-                if(this.y<0 || this.y>canvasElement.height) this.v.y*=-1;
             }
         }
         draw() {
             canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
-            canvasCtx.beginPath(); 
-            canvasCtx.arc(this.x, this.y, isFist?2.2:1.5, 0, Math.PI*2); 
+            canvasCtx.beginPath();
+            canvasCtx.arc(this.x, this.y, isFist ? 2.5 : 1.8, 0, Math.PI*2);
             canvasCtx.fill();
         }
     }
 
+    // 初始化
     initText();
-    for(let i=0; i<700; i++) particles.push(new Particle());
+    for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
 
     function animate() {
-        canvasElement.width = canvasElement.clientWidth;
-        canvasElement.height = canvasElement.clientHeight;
-        canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
-        canvasCtx.fillRect(0,0,canvasElement.width, canvasElement.height);
-        particles.forEach(p => { p.update(); p.draw(); });
+        // 動態調整解析度
+        if (canvasElement.width !== canvasElement.clientWidth) {
+            canvasElement.width = canvasElement.clientWidth;
+            canvasElement.height = canvasElement.clientHeight;
+        }
+        
+        canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
+        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
         requestAnimationFrame(animate);
     }
     animate();
 
     const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
     hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+    
     hands.onResults(res => {
         if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
             const h = res.multiHandLandmarks[0];
-            isFist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y) < 0.12;
+            // 偵測食指尖(8)與大拇指尖(4)的距離來判斷是否握拳
+            const dist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y);
+            isFist = dist < 0.1; 
+            // 鏡像座標處理
             currentHand = { x: 1 - h[9].x, y: h[9].y };
-        } else { 
-            isFist = false; 
+        } else {
+            isFist = false;
         }
     });
-    const camera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 1280, height: 720 });
+
+    const camera = new Camera(videoElement, {
+        onFrame: async () => { await hands.send({image: videoElement}); },
+        width: 1280, height: 720
+    });
     camera.start();
 </script>
-```
-
 </body>
 </html>
