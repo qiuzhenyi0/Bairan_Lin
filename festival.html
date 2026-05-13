@@ -7,13 +7,13 @@
     <style>
         body, html { margin: 0; padding: 0; background: #000; overflow: hidden; height: 100vh; width: 100%; }
         #output_canvas { width: 100%; height: 100%; object-fit: contain; }
-        .festival-ui { position: absolute; top: 20px; left: 20px; color: #FF69B4; z-index: 10; font-family: sans-serif; pointer-events: none; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
+        .festival-ui { position: absolute; top: 20px; left: 20px; color: #FF69B4; z-index: 10; font-family: sans-serif; pointer-events: none; text-shadow: 0 0 10px #000; }
     </style>
 </head>
 <body>
     <div class="festival-ui">
         <h2>🎂 Birthday Celebration 🎂</h2>
-        <p>✊ 握拳：凝聚祝福 / 🖐️ 張手：散開粒子</p>
+        <p>✊ 握拳：匯聚驚喜 / 🖐️ 張手：散開粒子</p>
     </div>
     <video id="input_video" style="display:none;" playsinline></video>
     <canvas id="output_canvas"></canvas>
@@ -23,35 +23,41 @@
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
     
-    // 增加粒子數量，讓形狀更紮實
     let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
-    const PARTICLE_COUNT = 2000; 
+    const PARTICLE_COUNT = 1800; 
 
+    // 初始化文字與蛋糕點位
     function initText() {
         const tCanvas = document.createElement('canvas');
         const tCtx = tCanvas.getContext('2d');
-        // 加大畫布空間
-        tCanvas.width = 1000; tCanvas.height = 500;
+        
+        // 關鍵修改：根據目前螢幕寬度來設定，不再固定 1000
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        tCanvas.width = w;
+        tCanvas.height = h;
         
         tCtx.fillStyle = "white";
-        tCtx.textAlign = "center"; 
+        tCtx.textAlign = "center";
         
-        // 繪製文字 (稍微加粗與調整位置)
-        tCtx.font = "bold 80px Arial";
-        tCtx.fillText("HAPPY BIRTHDAY", 500, 100);
-        tCtx.fillText("TO ME", 500, 190);
+        // 字體大小隨螢幕寬度調整
+        const fontSize = Math.min(w / 10, 60);
+        tCtx.font = `bold ${fontSize}px Arial`;
+        tCtx.fillText("HAPPY BIRTHDAY", w/2, h*0.35);
+        tCtx.fillText("TO ME", w/2, h*0.45);
         
-        // 換成整顆蛋糕 🎂 並且放得很大，讓輪廓更明顯
-        tCtx.font = "200px Arial"; 
-        tCtx.fillText("🎂", 500, 380);
+        // 蛋糕畫大一點，位置放低一點
+        tCtx.font = `${fontSize * 2.5}px Arial`;
+        tCtx.fillText("🎂", w/2, h*0.65);
 
-        const data = tCtx.getImageData(0, 0, 1000, 500).data;
+        const data = tCtx.getImageData(0, 0, w, h).data;
         textPoints = [];
-        // 縮小採樣間距 (y += 3)，提高精細度
-        for (let y = 0; y < 500; y += 3) {
-            for (let x = 0; x < 1000; x += 3) {
-                if (data[(y * 1000 + x) * 4 + 3] > 120) {
-                    textPoints.push({ x: x - 500, y: y - 250 });
+        // 採樣邏輯：每 3 像素抓一個點
+        for (let y = 0; y < h; y += 3) {
+            for (let x = 0; x < w; x += 3) {
+                if (data[(y * w + x) * 4 + 3] > 120) {
+                    // 儲存相對於中心點的偏移量
+                    textPoints.push({ x: x - w/2, y: y - h/2 });
                 }
             }
         }
@@ -62,20 +68,19 @@
             this.id = id;
             this.x = Math.random() * window.innerWidth;
             this.y = Math.random() * window.innerHeight;
-            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
-            // 色彩調整為粉嫩生日風
-            this.hue = Math.random() * 40 + 320; 
+            this.v = { x: (Math.random()-0.5)*4, y: (Math.random()-0.5)*4 };
+            this.hue = Math.random() * 40 + 325; // 甜美粉色系
             this.bri = 50;
         }
         update() {
             if (isFist && textPoints.length > 0) {
                 let pt = textPoints[this.id % textPoints.length];
-                // 加入一點隨機抖動感，讓蛋糕看起來在發光
+                // 目標座標 = 手部中心 + 偏移量
                 let tx = currentHand.x * canvasElement.width + pt.x;
                 let ty = currentHand.y * canvasElement.height + pt.y;
                 
-                this.x += (tx - this.x) * 0.18;
-                this.y += (ty - this.y) * 0.18;
+                this.x += (tx - this.x) * 0.2;
+                this.y += (ty - this.y) * 0.2;
                 this.bri = 60 + Math.random() * 40;
             } else {
                 this.x += this.v.x;
@@ -83,10 +88,10 @@
                 
                 if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
                 if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
-                
+
                 let dx = this.x - (currentHand.x * canvasElement.width);
                 let dy = this.y - (currentHand.y * canvasElement.height);
-                if (Math.hypot(dx, dy) > 300) {
+                if (Math.hypot(dx, dy) > 250) {
                     this.v.x -= dx * 0.001;
                     this.v.y -= dy * 0.001;
                 }
@@ -96,24 +101,21 @@
         draw() {
             canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
             canvasCtx.beginPath();
-            // 握拳時粒子變大一點點，讓形狀更飽滿
-            canvasCtx.arc(this.x, this.y, isFist ? 2.8 : 1.5, 0, Math.PI*2);
+            canvasCtx.arc(this.x, this.y, isFist ? 2.2 : 1.5, 0, Math.PI*2);
             canvasCtx.fill();
         }
     }
 
+    // 啟動與螢幕縮放處理
+    window.addEventListener('resize', initText);
     initText();
     for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
 
     function animate() {
-        if (canvasElement.width !== canvasElement.clientWidth) {
-            canvasElement.width = canvasElement.clientWidth;
-            canvasElement.height = canvasElement.clientHeight;
-        }
-        // 殘影效果稍微加強 (0.25)，讓移動更順滑
-        canvasCtx.fillStyle = "rgba(0,0,0,0.25)";
+        canvasElement.width = canvasElement.clientWidth;
+        canvasElement.height = canvasElement.clientHeight;
+        canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
         canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-        
         particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
     }
@@ -126,11 +128,9 @@
         if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
             const h = res.multiHandLandmarks[0];
             const dist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y);
-            isFist = dist < 0.12; 
+            isFist = dist < 0.1; 
             currentHand = { x: 1 - h[9].x, y: h[9].y };
-        } else {
-            isFist = false;
-        }
+        } else { isFist = false; }
     });
 
     const camera = new Camera(videoElement, {
