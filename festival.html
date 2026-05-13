@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
@@ -12,85 +13,92 @@
 </head>
 <body>
     <div class="festival-ui">
-        <h2>2025 New Year Event</h2>
+        <h2>🎂 Birthday Celebration 🎂</h2>
         <p>✊ 握拳：粒子匯聚成字 / 🖐️ 張手：繞手散開</p>
     </div>
     <video id="input_video" style="display:none;" playsinline></video>
     <canvas id="output_canvas"></canvas>
 
-    <script>
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
+```
+<script>
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
 
-        function initText() {
-            const tCanvas = document.createElement('canvas');
-            const tCtx = tCanvas.getContext('2d');
-            tCanvas.width = 800; tCanvas.height = 200;
-            tCtx.fillStyle = "white"; tCtx.font = "bold 80px Arial";
-            tCtx.textAlign = "center"; tCtx.fillText("HAPPY NEW YEAR", 400, 100);
-            const data = tCtx.getImageData(0, 0, 800, 200).data;
-            for (let y = 0; y < 200; y += 5) {
-                for (let x = 0; x < 800; x += 5) {
-                    if (data[(y * 800 + x) * 4 + 3] > 128) textPoints.push({ x: x - 400, y: y - 100 });
-                }
+    function initText() {
+        const tCanvas = document.createElement('canvas');
+        const tCtx = tCanvas.getContext('2d');
+        tCanvas.width = 1000; tCanvas.height = 300;
+        tCtx.fillStyle = "white"; tCtx.font = "bold 60px Arial";
+        tCtx.textAlign = "center"; 
+        tCtx.fillText("HAPPY BIRTHDAY", 500, 80);
+        tCtx.fillText("TO ME", 500, 150);
+        tCtx.font = "80px Arial";
+        tCtx.fillText("🍰", 500, 240);
+        const data = tCtx.getImageData(0, 0, 1000, 300).data;
+        for (let y = 0; y < 300; y += 4) {
+            for (let x = 0; x < 1000; x += 4) {
+                if (data[(y * 1000 + x) * 4 + 3] > 128) textPoints.push({ x: x - 500, y: y - 150 });
             }
         }
+    }
 
-        class Particle {
-            constructor() {
-                this.x = Math.random() * 800; this.y = Math.random() * 600;
-                this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
-                this.hue = Math.random()*40+160; this.bri = 50;
-            }
-            update() {
-                if (isFist) {
-                    let pt = textPoints[particles.indexOf(this) % textPoints.length];
-                    let tx = currentHand.x * canvasElement.width + pt.x;
-                    let ty = currentHand.y * canvasElement.height + pt.y;
-                    this.x += (tx - this.x) * 0.22; this.y += (ty - this.y) * 0.22;
-                    this.bri = Math.random()*40+60;
-                } else {
-                    this.x += this.v.x; this.y += this.v.y;
-                    let dx = this.x - (currentHand.x * canvasElement.width);
-                    let dy = this.y - (currentHand.y * canvasElement.height);
-                    if (Math.hypot(dx, dy) > 350) { this.v.x -= dx*0.015; this.v.y -= dy*0.015; }
-                    this.bri = 50;
-                    if(this.x<0 || this.x>canvasElement.width) this.v.x*=-1;
-                    if(this.y<0 || this.y>canvasElement.height) this.v.y*=-1;
-                }
-            }
-            draw() {
-                canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
-                canvasCtx.beginPath(); canvasCtx.arc(this.x, this.y, isFist?2.2:1.5, 0, Math.PI*2); canvasCtx.fill();
+    class Particle {
+        constructor() {
+            this.x = Math.random() * 800; this.y = Math.random() * 600;
+            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
+            this.hue = Math.random()*40+160; this.bri = 50;
+        }
+        update() {
+            if (isFist) {
+                let pt = textPoints[particles.indexOf(this) % textPoints.length];
+                let tx = currentHand.x * canvasElement.width + pt.x;
+                let ty = currentHand.y * canvasElement.height + pt.y;
+                this.x += (tx - this.x) * 0.22; this.y += (ty - this.y) * 0.22;
+                this.bri = Math.random()*40+60;
+            } else {
+                this.x += this.v.x; this.y += this.v.y;
+                let dx = this.x - (currentHand.x * canvasElement.width);
+                let dy = this.y - (currentHand.y * canvasElement.height);
+                if (Math.hypot(dx, dy) > 350) { this.v.x -= dx*0.015; this.v.y -= dy*0.015; }
+                this.bri = 50;
+                if(this.x<0 || this.x>canvasElement.width) this.v.x*=-1;
+                if(this.y<0 || this.y>canvasElement.height) this.v.y*=-1;
             }
         }
-
-        initText();
-        for(let i=0; i<700; i++) particles.push(new Particle());
-
-        function animate() {
-            canvasElement.width = canvasElement.clientWidth;
-            canvasElement.height = canvasElement.clientHeight;
-            canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
-            canvasCtx.fillRect(0,0,canvasElement.width, canvasElement.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
+        draw() {
+            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
+            canvasCtx.beginPath(); canvasCtx.arc(this.x, this.y, isFist?2.2:1.5, 0, Math.PI*2); canvasCtx.fill();
         }
-        animate();
+    }
 
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-        hands.onResults(res => {
-            if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
-                const h = res.multiHandLandmarks[0];
-                isFist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y) < 0.12;
-                currentHand = { x: 1 - h[9].x, y: h[9].y };
-            } else { isFist = false; }
-        });
-        const camera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 1280, height: 720 });
-        camera.start();
-    </script>
+    initText();
+    for(let i=0; i<700; i++) particles.push(new Particle());
+
+    function animate() {
+        canvasElement.width = canvasElement.clientWidth;
+        canvasElement.height = canvasElement.clientHeight;
+        canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
+        canvasCtx.fillRect(0,0,canvasElement.width, canvasElement.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+    hands.onResults(res => {
+        if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
+            const h = res.multiHandLandmarks[0];
+            isFist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y) < 0.12;
+            currentHand = { x: 1 - h[9].x, y: h[9].y };
+        } else { isFist = false; }
+    });
+    const camera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 1280, height: 720 });
+    camera.start();
+</script>
+```
+
 </body>
 </html>
