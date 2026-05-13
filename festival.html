@@ -7,10 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <style>
         body, html { margin: 0; padding: 0; background: #000; overflow: hidden; height: 100vh; width: 100%; }
-        #output_canvas { display: block; width: 100%; height: 100%; }
+        #output_canvas { width: 100%; height: 100%; object-fit: contain; }
         .festival-ui { position: absolute; top: 20px; left: 20px; color: #00F9C7; z-index: 10; font-family: sans-serif; pointer-events: none; }
-        .festival-ui h2 { margin: 0; font-size: 18px; }
-        .festival-ui p { margin: 5px 0 0 0; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -31,136 +29,89 @@
     function initText() {
         const tCanvas = document.createElement('canvas');
         const tCtx = tCanvas.getContext('2d');
-        tCanvas.width = 1200; 
-        tCanvas.height = 350;
-        
+        tCanvas.width = 1000; 
+        tCanvas.height = 250;
         tCtx.fillStyle = "white"; 
-        tCtx.font = "bold 70px Arial";
+        tCtx.font = "bold 60px Arial";
         tCtx.textAlign = "center"; 
-        tCtx.textBaseline = "middle";
+        tCtx.fillText("HAPPY BIRTHDAY", 500, 70);
+        tCtx.fillText("TO ME", 500, 130);
+        tCtx.font = "70px Arial";
+        tCtx.fillText("🍰", 500, 200);
         
-        tCtx.fillText("HAPPY BIRTHDAY", 600, 90);
-        tCtx.fillText("TO ME", 600, 170);
-        tCtx.font = "100px Arial";
-        tCtx.fillText("🍰", 600, 280);
-        
-        const imageData = tCtx.getImageData(0, 0, tCanvas.width, tCanvas.height);
-        const data = imageData.data;
-        
-        for (let i = 0; i < data.length; i += 4) {
-            if (data[i + 3] > 128) {
-                const pixelIndex = i / 4;
-                const x = pixelIndex % tCanvas.width;
-                const y = Math.floor(pixelIndex / tCanvas.width);
-                textPoints.push({ 
-                    x: x - tCanvas.width / 2, 
-                    y: y - tCanvas.height / 2 
-                });
+        const data = tCtx.getImageData(0, 0, 1000, 250).data;
+        for (let y = 0; y < 250; y += 3) {
+            for (let x = 0; x < 1000; x += 3) {
+                if (data[(y * 1000 + x) * 4 + 3] > 128) {
+                    textPoints.push({ x: x - 500, y: y - 125 });
+                }
             }
         }
-        console.log("Text points count:", textPoints.length);
     }
 
     class Particle {
         constructor() {
-            this.x = Math.random() * canvasElement.width; 
-            this.y = Math.random() * canvasElement.height;
-            this.v = { x: (Math.random()-0.5)*4, y: (Math.random()-0.5)*4 };
-            this.hue = Math.random()*60 + 150;
+            this.x = Math.random() * 800; 
+            this.y = Math.random() * 600;
+            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
+            this.hue = Math.random()*40+160; 
             this.bri = 50;
         }
         update() {
             if (isFist && textPoints.length > 0) {
-                const ptIdx = Math.floor(Math.random() * textPoints.length);
-                const pt = textPoints[ptIdx];
-                const tx = currentHand.x * canvasElement.width + pt.x * 1.2;
-                const ty = currentHand.y * canvasElement.height + pt.y * 1.2;
-                this.x += (tx - this.x) * 0.15;
-                this.y += (ty - this.y) * 0.15;
-                this.bri = Math.random() * 50 + 50;
+                let pt = textPoints[particles.indexOf(this) % textPoints.length];
+                let tx = currentHand.x * canvasElement.width + pt.x;
+                let ty = currentHand.y * canvasElement.height + pt.y;
+                this.x += (tx - this.x) * 0.22; 
+                this.y += (ty - this.y) * 0.22;
+                this.bri = Math.random()*40+60;
             } else {
-                this.x += this.v.x;
+                this.x += this.v.x; 
                 this.y += this.v.y;
-                
-                const handX = currentHand.x * canvasElement.width;
-                const handY = currentHand.y * canvasElement.height;
-                const dx = this.x - handX;
-                const dy = this.y - handY;
-                const dist = Math.hypot(dx, dy);
-                
-                if (dist < 300) {
-                    this.v.x -= (dx / dist) * 0.3;
-                    this.v.y -= (dy / dist) * 0.3;
+                let dx = this.x - (currentHand.x * canvasElement.width);
+                let dy = this.y - (currentHand.y * canvasElement.height);
+                if (Math.hypot(dx, dy) > 350) { 
+                    this.v.x -= dx*0.015; 
+                    this.v.y -= dy*0.015; 
                 }
-                
                 this.bri = 50;
-                
-                if (this.x < 0 || this.x > canvasElement.width) this.v.x *= -0.8;
-                if (this.y < 0 || this.y > canvasElement.height) this.v.y *= -0.8;
-                
-                if (this.v.x > 6) this.v.x = 6;
-                if (this.v.y > 6) this.v.y = 6;
+                if(this.x<0 || this.x>canvasElement.width) this.v.x*=-1;
+                if(this.y<0 || this.y>canvasElement.height) this.v.y*=-1;
             }
         }
         draw() {
             canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
-            canvasCtx.beginPath();
-            canvasCtx.arc(this.x, this.y, isFist ? 2.5 : 1.8, 0, Math.PI * 2);
+            canvasCtx.beginPath(); 
+            canvasCtx.arc(this.x, this.y, isFist?2.2:1.5, 0, Math.PI*2); 
             canvasCtx.fill();
         }
     }
 
     initText();
-    for (let i = 0; i < 800; i++) particles.push(new Particle());
+    for(let i=0; i<700; i++) particles.push(new Particle());
 
     function animate() {
-        canvasElement.width = window.innerWidth;
-        canvasElement.height = window.innerHeight;
-        
-        canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
-        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-        
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-        
+        canvasElement.width = canvasElement.clientWidth;
+        canvasElement.height = canvasElement.clientHeight;
+        canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
+        canvasCtx.fillRect(0,0,canvasElement.width, canvasElement.height);
+        particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
     }
     animate();
 
-    const hands = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-    });
-    hands.setOptions({
-        maxNumHands: 1,
-        modelComplexity: 1,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
-    });
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
     hands.onResults(res => {
         if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
             const h = res.multiHandLandmarks[0];
-            const fingerTip = h[8];
-            const fingerBase = h[5];
-            const palmBase = h[0];
-            
-            const distance = Math.hypot(fingerTip.x - palmBase.x, fingerTip.y - palmBase.y);
-            isFist = distance < 0.15;
-            
+            isFist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y) < 0.12;
             currentHand = { x: 1 - h[9].x, y: h[9].y };
-        } else {
-            isFist = false;
+        } else { 
+            isFist = false; 
         }
     });
-    
-    const camera = new Camera(videoElement, {
-        onFrame: async () => {
-            await hands.send({image: videoElement});
-        },
-        width: 1280,
-        height: 720
-    });
+    const camera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 1280, height: 720 });
     camera.start();
 </script>
 ```
