@@ -13,7 +13,7 @@
 <body>
     <div class="festival-ui">
         <h2>🎂 Birthday Celebration 🎂</h2>
-        <p>✊ 握拳：匯聚驚喜 / 🖐️ 張手：散開粒子</p>
+        <p>✊ 握拳：聚集驚喜 / 🖐️ 張手：散開粒子</p>
     </div>
     <video id="input_video" style="display:none;" playsinline></video>
     <canvas id="output_canvas"></canvas>
@@ -24,39 +24,54 @@
     const canvasCtx = canvasElement.getContext('2d');
     
     let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
-    const PARTICLE_COUNT = 1800; 
+    const PARTICLE_COUNT = 2000; // 增加粒子數，讓幾何形狀更紮實
 
-    // 初始化文字與蛋糕點位
     function initText() {
         const tCanvas = document.createElement('canvas');
         const tCtx = tCanvas.getContext('2d');
-        
-        // 關鍵修改：根據目前螢幕寬度來設定，不再固定 1000
         const w = window.innerWidth;
         const h = window.innerHeight;
         tCanvas.width = w;
         tCanvas.height = h;
         
-        tCtx.fillStyle = "white";
+        tCtx.fillStyle = "white"; // 使用純白繪製，確保採樣邊界清晰
         tCtx.textAlign = "center";
         
-        // 字體大小隨螢幕寬度調整
-        const fontSize = Math.min(w / 10, 60);
+        // 1. 繪製文字
+        const fontSize = Math.min(w / 10, 55);
         tCtx.font = `bold ${fontSize}px Arial`;
-        tCtx.fillText("HAPPY BIRTHDAY", w/2, h*0.35);
-        tCtx.fillText("TO ME", w/2, h*0.45);
+        tCtx.fillText("HAPPY BIRTHDAY", w/2, h*0.3);
+        tCtx.fillText("TO ME", w/2, h*0.4);
         
-        // 蛋糕畫大一點，位置放低一點
-        tCtx.font = `${fontSize * 2.5}px Arial`;
-        tCtx.fillText("🎂", w/2, h*0.65);
+        // 2. 繪製幾何蛋糕 (取代 Emoji)
+        const cx = w/2;
+        const cy = h*0.6; // 蛋糕中心點
+        
+        // 底層蛋糕
+        tCtx.fillRect(cx - 75, cy + 30, 150, 45);
+        // 中層蛋糕
+        tCtx.fillRect(cx - 55, cy - 10, 110, 40);
+        // 頂層蛋糕
+        tCtx.fillRect(cx - 35, cy - 40, 70, 30);
+        
+        // 蠟燭 (三根)
+        tCtx.fillRect(cx - 30, cy - 65, 6, 25); // 左
+        tCtx.fillRect(cx - 3, cy - 70, 6, 30);  // 中
+        tCtx.fillRect(cx + 24, cy - 65, 6, 25); // 右
+        
+        // 燭火 (小圓點)
+        tCtx.beginPath();
+        tCtx.arc(cx - 27, cy - 75, 5, 0, Math.PI*2);
+        tCtx.arc(cx, cy - 82, 6, 0, Math.PI*2);
+        tCtx.arc(cx + 27, cy - 75, 5, 0, Math.PI*2);
+        tCtx.fill();
 
         const data = tCtx.getImageData(0, 0, w, h).data;
         textPoints = [];
-        // 採樣邏輯：每 3 像素抓一個點
-        for (let y = 0; y < h; y += 3) {
-            for (let x = 0; x < w; x += 3) {
-                if (data[(y * w + x) * 4 + 3] > 120) {
-                    // 儲存相對於中心點的偏移量
+        // 提高採樣密度 (y+=2, x+=2)
+        for (let y = 0; y < h; y += 2) {
+            for (let x = 0; x < w; x += 2) {
+                if (data[(y * w + x) * 4 + 3] > 128) {
                     textPoints.push({ x: x - w/2, y: y - h/2 });
                 }
             }
@@ -68,27 +83,24 @@
             this.id = id;
             this.x = Math.random() * window.innerWidth;
             this.y = Math.random() * window.innerHeight;
-            this.v = { x: (Math.random()-0.5)*4, y: (Math.random()-0.5)*4 };
-            this.hue = Math.random() * 40 + 325; // 甜美粉色系
+            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
+            this.hue = Math.random() * 40 + 330; 
             this.bri = 50;
         }
         update() {
             if (isFist && textPoints.length > 0) {
                 let pt = textPoints[this.id % textPoints.length];
-                // 目標座標 = 手部中心 + 偏移量
                 let tx = currentHand.x * canvasElement.width + pt.x;
                 let ty = currentHand.y * canvasElement.height + pt.y;
                 
                 this.x += (tx - this.x) * 0.2;
                 this.y += (ty - this.y) * 0.2;
-                this.bri = 60 + Math.random() * 40;
+                this.bri = 70 + Math.random() * 30;
             } else {
                 this.x += this.v.x;
                 this.y += this.v.y;
-                
                 if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
                 if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
-
                 let dx = this.x - (currentHand.x * canvasElement.width);
                 let dy = this.y - (currentHand.y * canvasElement.height);
                 if (Math.hypot(dx, dy) > 250) {
@@ -101,12 +113,12 @@
         draw() {
             canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
             canvasCtx.beginPath();
-            canvasCtx.arc(this.x, this.y, isFist ? 2.2 : 1.5, 0, Math.PI*2);
+            // 握拳時縮小粒子直徑 (1.8)，讓邊緣更銳利
+            canvasCtx.arc(this.x, this.y, isFist ? 1.8 : 1.5, 0, Math.PI*2);
             canvasCtx.fill();
         }
     }
 
-    // 啟動與螢幕縮放處理
     window.addEventListener('resize', initText);
     initText();
     for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
@@ -114,7 +126,7 @@
     function animate() {
         canvasElement.width = canvasElement.clientWidth;
         canvasElement.height = canvasElement.clientHeight;
-        canvasCtx.fillStyle = "rgba(0,0,0,0.2)";
+        canvasCtx.fillStyle = "rgba(0,0,0,0.25)";
         canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
         particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
@@ -123,7 +135,6 @@
 
     const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
     hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-    
     hands.onResults(res => {
         if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
             const h = res.multiHandLandmarks[0];
@@ -132,11 +143,7 @@
             currentHand = { x: 1 - h[9].x, y: h[9].y };
         } else { isFist = false; }
     });
-
-    const camera = new Camera(videoElement, {
-        onFrame: async () => { await hands.send({image: videoElement}); },
-        width: 1280, height: 720
-    });
+    const camera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 1280, height: 720 });
     camera.start();
 </script>
 </body>
