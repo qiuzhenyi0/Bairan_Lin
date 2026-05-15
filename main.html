@@ -1,397 +1,141 @@
 <!DOCTYPE html>
-
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Project Zero</title>
     <style>
-        /* ===== 全局基礎設定 ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ===== 任務 8：響應式變數與基礎設定 ===== */
+        :root {
+            --primary: #00F9C7;
+            --sidebar-bg: #a3d9c9;
+            --header-h: 50px;
+            --sidebar-w: 200px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-```
-    body, html {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #000;
-        font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-    }
-
-    /* ===== Header 響應式優化 (任務 1) ===== */
-    
-    /* 基礎樣式（320px 超小手機） */
-    .header {
-        width: 100%;
-        background: #00F9C7;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 15px;
-        box-sizing: border-box;
-        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-        flex-wrap: wrap;
-        gap: 8px;
-        z-index: 1000;
-    }
-
-    .header .title {
-        font-size: clamp(16px, 4vw, 42px);
-        font-weight: 700;
-        color: #0D0D0D;
-        flex: 1;
-        min-width: 150px;
-        word-break: break-word;
-    }
-
-    .header .welcome-text {
-        font-size: 12px;
-        opacity: 0.7;
-        letter-spacing: 2px;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    /* 480px（中小手機） */
-    @media (min-width: 480px) {
-        .header {
-            padding: 14px 20px;
-            gap: 12px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background: #000; font-family: "Noto Sans TC", sans-serif; 
         }
 
-        .header .title {
-            font-size: clamp(18px, 4.5vw, 42px);
+        /* ===== 任務 1：Header 優化 ===== */
+        .header-wrapper {
+            width: 100%; height: var(--header-h); background: var(--primary);
+            display: flex; align-items: center; padding: 0 15px;
+            z-index: 1002; position: relative;
         }
 
-        .header .welcome-text {
-            font-size: 13px;
-            opacity: 0.75;
-            letter-spacing: 3px;
-        }
-    }
-
-    /* 768px（平板豎屏 / 大手機） */
-    @media (min-width: 768px) {
-        .header {
-            padding: 18px 30px;
-            gap: 15px;
+        .header-title {
+            flex: 1; font-size: clamp(16px, 4.5vw, 22px);
+            font-weight: 700; color: #0D0D0D;
         }
 
-        .header .title {
-            font-size: clamp(20px, 5vw, 42px);
+        .welcome-text { font-size: 12px; opacity: 0.7; letter-spacing: 2px; }
+
+        /* --- 漢堡選單 (任務 2) --- */
+        .hamburger {
+            width: 45px; height: 100%; display: flex; flex-direction: column;
+            justify-content: center; gap: 5px; cursor: pointer; border: none; background: none;
         }
-
-        .header .welcome-text {
-            font-size: 16px;
-            opacity: 0.8;
-            letter-spacing: 4px;
+        .hamburger span {
+            width: 24px; height: 3px; background: #0D0D0D;
+            border-radius: 2px; transition: var(--transition);
         }
-    }
+        /* 變形成 X 的修正 (任務 2) */
+        .active .hamburger span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .active .hamburger span:nth-child(2) { opacity: 0; }
+        .active .hamburger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-    /* 1024px（平板橫屏） */
-    @media (min-width: 1024px) {
-        .header {
-            padding: 20px 40px;
-        }
+        @media (min-width: 768px) { .hamburger { display: none; } }
 
-        .header .title {
-            font-size: clamp(24px, 5vw, 42px);
-        }
-
-        .header .welcome-text {
-            font-size: 18px;
-            opacity: 0.8;
-            letter-spacing: 4px;
-        }
-    }
-
-    /* 橫屏模式調整（手機橫屏時） */
-    @media (max-height: 500px) and (orientation: landscape) {
-        .header {
-            padding: 10px 20px;
-        }
-
-        .header .title {
-            font-size: clamp(14px, 3vw, 28px);
-        }
-
-        .header .welcome-text {
-            font-size: 11px;
-        }
-    }
-
-    /* ===== Layout 佈局 ===== */
-    .layout {
-        display: flex;
-        height: calc(100vh - 45px);
-        width: 100%;
-    }
-
-    /* 手機版 height 調整 */
-    @media (min-width: 768px) {
-        .layout {
-            height: calc(100vh - 60px);
-        }
-    }
-
-    /* ===== 側邊欄 (Sidebar) - 任務 2 預留空間 ===== */
-    .sidebar {
-        width: 70px;
-        flex-shrink: 0;
-        background-color: #a3d9c9;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 8px 0;
-        z-index: 99;
-        overflow-y: auto;
-    }
-
-    .sidebar a {
-        width: 100%;
-        padding: 10px 8px;
-        color: #333;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 11px;
-        text-align: center;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-        transition: 0.3s ease;
-        word-break: break-word;
-    }
-
-    .sidebar a:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateX(3px);
-    }
-
-    @media (min-width: 768px) {
+        /* ===== 任務 2：Sidebar 抽屜式設計 ===== */
         .sidebar {
-            width: 180px;
-            padding: 12px 0;
+            position: fixed; top: var(--header-h); left: -100%; /* 預設藏起來 */
+            width: 260px; height: calc(100vh - var(--header-h));
+            background: var(--sidebar-bg); z-index: 1001;
+            transition: var(--transition); display: flex; flex-direction: column;
         }
+        .active .sidebar { left: 0; }
 
+        .nav-links { flex: 1; padding: 20px 0; }
         .sidebar a {
-            font-size: 15px;
-            padding: 12px 10px;
+            display: block; padding: 15px 25px; color: #0D0D0D;
+            text-decoration: none; font-weight: 600; min-height: 48px; /* 任務 9 */
         }
-    }
+        .sidebar a:active { background: rgba(0,0,0,0.1); }
 
-    /* ===== 內容區 ===== */
-    .content-area {
-        flex-grow: 1;
-        position: relative;
-        background: #000;
-        overflow: hidden;
-    }
+        /* 遮罩層 */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden;
+            transition: var(--transition); z-index: 1000;
+        }
+        .active .overlay { opacity: 1; visibility: visible; }
 
-    .content-area iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
+        /* ===== 內容區佈局 ===== */
+        .layout { display: flex; height: calc(100vh - var(--header-h)); width: 100%; }
+        .content-area { flex: 1; position: relative; background: #000; }
+        iframe { width: 100%; height: 100%; border: none; }
 
-    /* ===== 側邊欄底部控制 ===== */
-    .sidebar-bottom-group {
-        margin-top: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        padding-bottom: 12px;
-        gap: 8px;
-    }
-
-    #music-ui {
-        width: 50px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-    #music-ui img {
-        width: 100%;
-        display: block;
-        user-select: none;
-    }
-
-    #music-ui:hover {
-        transform: scale(1.05);
-    }
-
-    .dog-container {
-        width: 28px;
-        margin-top: 4px;
-    }
-
-    .dog-container img {
-        width: 100%;
-        display: block;
-    }
-
-    @media (min-width: 768px) {
-        #music-ui {
-            width: 100px;
+        /* 桌面版恢復靜態側邊欄 (任務 8) */
+        @media (min-width: 768px) {
+            .sidebar { position: static; width: var(--sidebar-w); left: 0; }
+            .overlay { display: none; }
         }
 
-        .dog-container {
-            width: 50px;
-        }
-    }
-
-    /* ===== 無障礙調整 ===== */
-    @media (prefers-reduced-motion: reduce) {
-        * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
-    }
-
-    /* 深色模式支持 */
-    @media (prefers-color-scheme: dark) {
-        .header {
-            background: #00D4B0;
-            border-bottom-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .header .title {
-            color: #FFFFFF;
-        }
-    }
-
-    /* 觸碰友善度（移動設備） */
-    @media (hover: none) and (pointer: coarse) {
-        .sidebar a {
-            padding: 14px 10px;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #music-ui {
-            min-height: 44px;
-            min-width: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
-</style>
-```
-
+        /* 音樂/狗狗組件 */
+        .sidebar-bottom { padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        #music-ui img { width: 60px; cursor: pointer; transition: 0.3s; }
+        .dog-container img { width: 45px; }
+    </style>
 </head>
 <body>
-    <!-- 背景音樂 -->
-    <audio id="bgm" loop preload="auto">
-        <source src="Music/Music.mp3" type="audio/mpeg">
-    </audio>
 
-```
-<!-- Header (任務 1 優化) -->
-<div class="header">
-    <div class="title">Project Zero / 零計畫</div>
-    <div class="welcome-text">Welcome</div>
-</div>
+<audio id="bgm" loop><source src="Music/Music.mp3" type="audio/mpeg"></audio>
 
-<!-- 主佈局 -->
-<div class="layout">
-    <!-- 側邊欄 -->
-    <div class="sidebar">
-        <a href="home.html" target="content-frame">自介</a>
-        <a href="diary.html" target="content-frame">日記</a>
-        <a href="blog.html" target="content-frame">部落格</a>
-        <a href="gallery.html" target="content-frame">相簿</a>
-        <a href="collections.html" target="content-frame">收藏</a>
-        <a href="fortune.html" target="content-frame">幸運指數</a>
-        <a href="festival.html" target="content-frame">節慶</a>
+<div id="main-layout">
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <header class="header-wrapper">
+        <button class="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="header-title">Project Zero / 零計畫</div>
+        <div class="welcome-text">Welcome</div>
+    </header>
 
-        <!-- 側邊欄底部：音樂控制 + 小狗 -->
-        <div class="sidebar-bottom-group">
-            <div id="music-ui" onclick="togglePlay()" role="button" tabindex="0" aria-label="播放/暫停音樂">
-                <img id="btn-img" src="Music/IMG_3115.png" alt="音樂控制按鈕">
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="nav-links">
+                <a href="home.html" target="content-frame">自介</a>
+                <a href="diary.html" target="content-frame">日記</a>
+                <a href="blog.html" target="content-frame">部落格</a>
+                <a href="gallery.html" target="content-frame">相簿</a>
+                <a href="collections.html" target="content-frame">收藏</a>
             </div>
-            <div class="dog-container">
-                <img src="GIF_20251224164146204.gif" alt="裝飾小狗">
+            <div class="sidebar-bottom">
+                <div id="music-ui" onclick="togglePlay()"><img id="btn-img" src="Music/IMG_3115.png"></div>
+                <div class="dog-container"><img src="GIF_20251224164146204.gif"></div>
             </div>
-        </div>
-    </div>
-
-    <!-- 內容區 -->
-    <div class="content-area">
-        <iframe src="home.html" name="content-frame" title="頁面內容"></iframe>
+        </nav>
+        <main class="content-area">
+            <iframe src="home.html" name="content-frame"></iframe>
+        </main>
     </div>
 </div>
 
 <script>
+    function toggleMenu() { document.getElementById('main-layout').classList.toggle('active'); }
+    
+    // 音樂控制邏輯
     const audio = document.getElementById('bgm');
     const img = document.getElementById('btn-img');
-    const musicUI = document.getElementById('music-ui');
-
-    // 更新音樂圖示
-    function updateIcon() {
-        img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png";
-    }
-
-    // 切換播放/暫停
     function togglePlay() {
-        if (audio.paused) {
-            audio.play()
-                .then(() => {
-                    updateIcon();
-                })
-                .catch(() => {
-                    updateIcon();
-                });
-        } else {
-            audio.pause();
-            updateIcon();
-        }
+        if (audio.paused) { audio.play(); img.src = "Music/IMG_3116.png"; }
+        else { audio.pause(); img.src = "Music/IMG_3115.png"; }
     }
-
-    // 支持鍵盤控制
-    musicUI.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            togglePlay();
-        }
-    });
-
-    // 頁面載入時檢查自動播放
-    window.addEventListener('load', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('autoplay') === 'true') {
-            audio.play()
-                .then(() => {
-                    updateIcon();
-                })
-                .catch(() => {
-                    updateIcon();
-                });
-        }
-    });
-
-    // 使用者首次互動後自動播放
-    document.addEventListener('click', () => {
-        if (audio.paused && audio.currentTime === 0) {
-            audio.play()
-                .then(() => {
-                    updateIcon();
-                })
-                .catch(() => {
-                    updateIcon();
-                });
-        }
-    }, { once: true });
 </script>
-```
-
 </body>
 </html>
