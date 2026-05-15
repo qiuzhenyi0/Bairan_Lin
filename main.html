@@ -2,7 +2,7 @@
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Project Zero</title>
     <style>
         /* ===== 全局基礎設定 ===== */
@@ -14,7 +14,8 @@
 
         body, html {
             width: 100%;
-            height: 100%;
+            /* 修正 1：外層改用 100dvh，精準貼合手機可見螢幕 */
+            height: 100dvh; 
             overflow: hidden;
             background: #000;
             font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
@@ -49,7 +50,6 @@
             transition: all 0.3s ease;
         }
 
-        /* 修正：當選單開啟時背景色與側邊欄一致 */
         .hamburger-btn.active {
             background-color: #a3d9c9;
         }
@@ -62,7 +62,6 @@
             transition: all 0.3s ease;
         }
 
-        /* 修正：X 圖示旋轉角度與位移 (任務 2) */
         .hamburger-btn.active span:nth-child(1) {
             transform: rotate(45deg) translate(6px, 6px);
         }
@@ -103,13 +102,15 @@
         /* ===== Layout 佈局 ===== */
         .layout {
             display: flex;
-            height: calc(100vh - 45px);
+            /* 修正 2：扣除 header 高度時，基準使用 100dvh */
+            height: calc(100dvh - 45px); 
             width: 100%;
             position: relative;
         }
 
         @media (min-width: 768px) {
-            .layout { height: calc(100vh - 60px); }
+            /* 修正 3：桌面版同理 */
+            .layout { height: calc(100dvh - 60px); } 
         }
 
         /* ===== Sidebar 導航列 ===== */
@@ -118,7 +119,8 @@
             left: 0;
             top: 45px;
             width: 250px;
-            height: calc(100vh - 45px);
+            /* 修正 4：Sidebar 也要配合 100dvh，否則底部會少一截或超出 */
+            height: calc(100dvh - 45px); 
             background-color: #a3d9c9;
             display: flex;
             flex-direction: column;
@@ -143,7 +145,6 @@
             }
         }
 
-        /* 導航連結容器 */
         .nav-links {
             display: flex;
             flex-direction: column;
@@ -168,7 +169,6 @@
             padding-left: 25px;
         }
 
-        /* 側邊欄底部控制 */
         .sidebar-bottom-group {
             padding: 20px 0;
             display: flex;
@@ -190,7 +190,6 @@
         .dog-container { width: 45px; }
         .dog-container img { width: 100%; }
 
-        /* 遮罩層 */
         .sidebar-overlay {
             position: fixed;
             top: 45px; left: 0; right: 0; bottom: 0;
@@ -206,7 +205,6 @@
             visibility: visible;
         }
 
-        /* 內容區 */
         .content-area {
             flex-grow: 1;
             position: relative;
@@ -278,14 +276,12 @@
         hamburger.addEventListener('click', toggleMenu);
         overlay.addEventListener('click', toggleMenu);
 
-        // 點擊連結後自動收起選單
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth < 768) toggleMenu();
             });
         });
 
-        // 音樂控制
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
 
@@ -302,7 +298,6 @@
             }
         }
 
-        // 首次點擊啟動播放
         document.addEventListener('click', () => {
             if (audio.paused && audio.currentTime === 0) {
                 audio.play().then(updateIcon).catch(updateIcon);
