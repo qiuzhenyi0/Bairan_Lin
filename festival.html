@@ -3,115 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Project Zero | Birthday Celebration</title>
+    <title>Birthday Celebration</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <style>
-        :root {
-            --primary-bg: #00F9C7;
-            --sidebar-bg: #1A4D40; /* 配合你截圖中的深綠色 */
-            --text-light: #FFFFFF;
-            --header-h: 70px;
+        body, html { 
+            margin: 0; padding: 0; background: #000; overflow: hidden; 
+            height: 100vh; width: 100vw; 
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: "Noto Sans TC", sans-serif; }
-
-        /* 整體佈局 */
-        .layout { display: flex; flex-direction: column; height: 100vh; }
-        
-        /* 頂部導覽列 (配合截圖樣式) */
-        .header { 
-            height: var(--header-h); 
-            background: var(--primary-bg); 
-            display: flex; 
-            align-items: center; 
-            padding: 0 25px; 
-            font-size: 24px; 
-            font-weight: 900; 
-            color: #000;
-            z-index: 100;
+        #output_canvas { 
+            width: 100%; height: 100%; display: block; 
         }
-
-        .main-container { display: flex; flex: 1; overflow: hidden; }
-
-        /* 左側側邊欄 (配合截圖樣式) */
-        .sidebar { 
-            width: 180px; 
-            background: var(--sidebar-bg); 
-            display: flex; 
-            flex-direction: column; 
-            padding-top: 20px;
+        /* 頂標文字維持綠色 */
+        .festival-ui { 
+            position: absolute; top: 20px; left: 20px; color: #00F9C7; 
+            z-index: 10; font-family: sans-serif; pointer-events: none; 
+            text-shadow: 0 0 10px rgba(0,0,0,0.8); 
         }
-        .sidebar-item { 
-            padding: 15px 25px; 
-            color: var(--text-light); 
-            text-decoration: none; 
-            font-weight: bold;
-            font-size: 16px;
-            opacity: 0.8;
-        }
-        .sidebar-item.active { background: rgba(255,255,255,0.1); opacity: 1; border-right: 4px solid var(--primary-bg); }
-
-        /* 右側畫布內容 */
-        .main-content { flex: 1; position: relative; background: #000; overflow: hidden; }
-        #output_canvas { width: 100%; height: 100%; display: block; }
-
-        /* 粒子狀態顯示 */
-        .festival-ui {
-            position: absolute; top: 25px; left: 25px; 
-            color: var(--primary-bg); z-index: 10; 
-            pointer-events: none; text-shadow: 0 0 10px rgba(0,0,0,0.8);
-        }
-        #status { font-size: 14px; opacity: 0.8; margin-top: 5px; }
-
-        /* 手機適配：自動隱藏 Sidebar */
-        @media (max-width: 768px) {
-            .sidebar { width: 0; display: none; }
+        #status {
+            font-size: 14px; margin-top: 5px; color: #fff; opacity: 0.8;
         }
     </style>
 </head>
 <body>
-
-<div class="layout">
-    <header class="header">Project Zero / 零計畫</header>
-
-    <div class="main-container">
-        <nav class="sidebar">
-            <a href="#" class="sidebar-item">自介</a>
-            <a href="#" class="sidebar-item">日記</a>
-            <a href="#" class="sidebar-item">部落格</a>
-            <a href="#" class="sidebar-item">相簿</a>
-            <a href="#" class="sidebar-item">收藏</a>
-            <a href="#" class="sidebar-item">幸運指數</a>
-            <a href="#" class="sidebar-item active">節慶</a>
-        </nav>
-
-        <main class="main-content" id="canvas_parent">
-            <div class="festival-ui">
-                <h2>Birthday Celebration🍰 5/17</h2>
-                <div id="status">正在啟動感應鏡頭...</div>
-            </div>
-            <canvas id="output_canvas"></canvas>
-            <video id="input_video" style="display:none;" playsinline></video>
-        </main>
+    <div class="festival-ui">
+        <h2>🎂 Birthday Celebration 🎂</h2>
+        <p>✊ 握拳：聚集驚喜 / 🖐️ 張手：散開粒子</p>
+        <p id="status">狀態：正在啟動相機...</p>
     </div>
-</div>
+    <video id="input_video" style="display:none;" playsinline></video>
+    <canvas id="output_canvas"></canvas>
 
 <script>
     const videoElement = document.getElementById('input_video');
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
-    const parent = document.getElementById('canvas_parent');
     const statusText = document.getElementById('status');
     
-    let particles = [], textPoints = [], isFist = false;
-    let currentHand = { x: 0.5, y: 0.5 };
-    const PARTICLE_COUNT = 1600; 
+    let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
+    const PARTICLE_COUNT = 1800; 
 
-    // 初始化文字點雲
     function initText() {
-        const w = parent.clientWidth;
-        const h = parent.clientHeight;
+        // 設定畫布實際像素尺寸，避免手機上變形
+        const w = window.innerWidth;
+        const h = window.innerHeight;
         canvasElement.width = w;
         canvasElement.height = h;
 
@@ -122,34 +57,34 @@
         tCtx.fillStyle = "white"; 
         tCtx.textAlign = "center";
         
-        // 字體縮放
         const fontSize = Math.min(w / 10, 55);
         tCtx.font = `bold ${fontSize}px Arial`;
-        tCtx.fillText("HAPPY BIRTHDAY", w/2, h * 0.35);
-        tCtx.fillText("TO ME", w/2, h * 0.46);
+        tCtx.fillText("HAPPY BIRTHDAY", w/2, h*0.3);
+        tCtx.fillText("TO ME", w/2, h*0.42);
         
         const cx = w/2;
-        const cy = h * 0.7; // 蛋糕位置稍微調低，看起來比較穩
+        const cy = h*0.65; // 稍微調高，避免手機底部被裁切
         
-        // 蛋糕細節繪製
-        tCtx.fillRect(cx - 70, cy + 30, 140, 35);
-        tCtx.fillRect(cx - 55, cy - 5, 110, 35);
-        tCtx.fillRect(cx - 35, cy - 35, 70, 30);
-        // 蠟燭與火
-        tCtx.fillRect(cx - 25, cy - 55, 4, 20);
-        tCtx.fillRect(cx - 2, cy - 62, 4, 27);
-        tCtx.fillRect(cx + 21, cy - 55, 4, 20);
-        [ [cx-23, cy-58], [cx, cy-65], [cx+23, cy-58] ].forEach(p => {
-            tCtx.beginPath(); tCtx.arc(p[0], p[1], 5, 0, Math.PI*2); tCtx.fill();
+        tCtx.fillRect(cx - 70, cy + 30, 140, 35); // 底層
+        tCtx.fillRect(cx - 50, cy - 5, 100, 30);  // 中層
+        tCtx.fillRect(cx - 30, cy - 35, 60, 25);  // 頂層
+        
+        tCtx.fillRect(cx - 25, cy - 52, 4, 18); // 蠟燭 L
+        tCtx.fillRect(cx - 2, cy - 58, 4, 24);  // 蠟燭 M
+        tCtx.fillRect(cx + 21, cy - 52, 4, 18); // 蠟燭 R
+        
+        // 獨立繪製火苗，防止黏連
+        [[cx - 23, cy - 58, 3], [cx, cy - 65, 4], [cx + 23, cy - 58, 3]].forEach(p => {
+            tCtx.beginPath();
+            tCtx.arc(p[0], p[1], p[2], 0, Math.PI*2);
+            tCtx.fill();
         });
 
         const data = tCtx.getImageData(0, 0, w, h).data;
         textPoints = [];
-        for (let y = 0; y < h; y += 3) {
-            for (let x = 0; x < w; x += 3) {
-                if (data[(y * w + x) * 4 + 3] > 128) {
-                    textPoints.push({ x: x - w/2, y: y - h/2 });
-                }
+        for (let y = 0; y < h; y += 2) {
+            for (let x = 0; x < w; x += 2) {
+                if (data[(y * w + x) * 4 + 3] > 128) textPoints.push({ x: x - w/2, y: y - h/2 });
             }
         }
     }
@@ -157,65 +92,75 @@
     class Particle {
         constructor(id) {
             this.id = id;
-            this.x = Math.random() * parent.clientWidth;
-            this.y = Math.random() * parent.clientHeight;
+            this.x = Math.random() * window.innerWidth;
+            this.y = Math.random() * window.innerHeight;
             this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
-            this.hue = Math.random() * 40 + 330; // 桃粉色調
+            // 粉嫩/閃爍色調 (Hue 330-360 是粉色到桃色)
+            this.hue = Math.random() * 40 + 330; 
+            this.bri = 50;
         }
         update() {
             if (isFist && textPoints.length > 0) {
                 let pt = textPoints[this.id % textPoints.length];
                 let tx = currentHand.x * canvasElement.width + pt.x;
                 let ty = currentHand.y * canvasElement.height + pt.y;
-                this.x += (tx - this.x) * 0.18;
+                this.x += (tx - this.x) * 0.18; // 加快聚集反應速度
                 this.y += (ty - this.y) * 0.18;
+                this.bri = 60 + Math.random() * 40;
             } else {
                 this.x += this.v.x;
                 this.y += this.v.y;
                 if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
                 if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
+                let dx = this.x - (currentHand.x * canvasElement.width);
+                let dy = this.y - (currentHand.y * canvasElement.height);
+                if (Math.hypot(dx, dy) > 250) { this.v.x -= dx * 0.001; this.v.y -= dy * 0.001; }
+                this.bri = 50;
             }
         }
         draw() {
-            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${isFist ? 70 : 50}%)`;
+            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
             canvasCtx.beginPath();
             canvasCtx.arc(this.x, this.y, isFist ? 2.2 : 1.5, 0, Math.PI*2);
             canvasCtx.fill();
         }
     }
 
+    // 視窗縮放時重新計算文字與畫布大小
     window.addEventListener('resize', initText);
+    
     initText();
     for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
 
     function animate() {
-        canvasCtx.fillStyle = "rgba(0,0,0,0.18)";
+        // 關鍵修正：不再每偵重設 canvas 寬高，保留長拖尾感
+        canvasCtx.fillStyle = "rgba(0,0,0,0.12)";
         canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+        
         particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
     }
     animate();
 
-    // MediaPipe Hands 設定
     const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
     
     hands.onResults(res => {
         if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
             const h = res.multiHandLandmarks[0];
-            // 握拳邏輯修正
-            isFist = h[8].y > h[6].y && h[12].y > h[10].y && h[16].y > h[14].y; 
+            // 靈敏版握拳偵測：判斷食指、中指、無名指是否收起
+            isFist = h[8].y > h[6].y && h[12].y > h[10].y && h[16].y > h[14].y;
             currentHand = { x: 1 - h[9].x, y: h[9].y };
-            statusText.innerText = isFist ? "狀態：聚集粒子模式" : "狀態：手部感應中 - 請試試握拳";
-        } else {
-            isFist = false;
-            statusText.innerText = "狀態：未偵測到手部";
+            statusText.innerText = isFist ? "狀態：✨ 聚集驚喜中 ✨" : "狀態：手部追蹤中";
+        } else { 
+            isFist = false; 
+            statusText.innerText = "狀態：請將手放在鏡頭前";
         }
     });
 
-    const camera = new Camera(videoElement, {
-        onFrame: async () => { await hands.send({image: videoElement}); },
-        width: 640, height: 480
+    const camera = new Camera(videoElement, { 
+        onFrame: async () => { await hands.send({image: videoElement}); }, 
+        width: 640, height: 480 // 使用較低解析度確保手機順暢運行
     });
     camera.start();
 </script>
