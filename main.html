@@ -1,308 +1,79 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Project Zero</title>
     <style>
-        /* ===== 全局基礎設定 ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
 
-        body, html {
-            width: 100%;
-            /* 修正 1：外層改用 100dvh，精準貼合手機可見螢幕 */
-            height: 100dvh; 
-            overflow: hidden;
-            background: #000;
-            font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-        }
+```
+    /* Header 縮小字體 */
+    .header { height: 45px; background: #00F9C7; display: flex; align-items: center; padding: 0 12px; position: relative; z-index: 1000; }
+    .header .title { font-weight: bold; color: #000; font-size: 14px; flex-grow: 1; }
+    .welcome-text { font-size: 10px; opacity: 0.6; letter-spacing: 1px; }
 
-        /* ===== Header 區域 ===== */
-        .header-wrapper {
-            width: 100%;
-            background: #00F9C7;
-            display: flex;
-            align-items: center;
-            height: 45px;
-            position: relative;
-            z-index: 1000;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-        }
+    .layout { display: flex; height: calc(100vh - 45px); width: 100%; }
 
-        /* --- 漢堡選單按鈕 (任務 2 優化) --- */
-        .hamburger-btn {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 8px 12px;
-            z-index: 1001;
-            width: 50px;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
+    /* 側邊欄：字體與寬度極小化 */
+    .sidebar { width: 70px; flex-shrink: 0; background-color: #a3d9c9; display: flex; flex-direction: column; align-items: center; padding: 8px 0; z-index: 99; }
+    .sidebar a { width: 100%; padding: 10px 0; color: #333; text-decoration: none; font-weight: bold; font-size: 11px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); }
 
-        .hamburger-btn.active {
-            background-color: #a3d9c9;
-        }
+    .content-area { flex-grow: 1; position: relative; background: #000; }
+    iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .hamburger-btn span {
-            width: 24px;
-            height: 3px;
-            background: #0D0D0D;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
+    .sidebar-bottom-group { margin-top: auto; display: flex; flex-direction: column; align-items: center; width: 100%; padding-bottom: 12px; }
+    #music-ui { width: 60px; cursor: pointer; margin-bottom: 4px; }
+    #music-ui img { width: 100%; display: block; }
+    .dog-container { width: 30px; }
+    .dog-container img { width: 100%; display: block; }
 
-        .hamburger-btn.active span:nth-child(1) {
-            transform: rotate(45deg) translate(6px, 6px);
-        }
+    @media (min-width: 768px) {
+        .header { height: 60px; }
+        .header .title { font-size: 20px; }
+        .sidebar { width: 180px; }
+        .sidebar a { font-size: 15px; padding: 15px 0; }
+        .layout { height: calc(100vh - 60px); }
+        #music-ui { width: 110px; }
+        .dog-container { width: 55px; }
+    }
+</style>
+```
 
-        .hamburger-btn.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger-btn.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
-
-        @media (min-width: 768px) {
-            .hamburger-btn { display: none; }
-            .header-wrapper { height: 60px; }
-        }
-
-        .header {
-            flex: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 15px;
-        }
-
-        .header .title {
-            font-size: clamp(16px, 4vw, 32px);
-            font-weight: 700;
-            color: #0D0D0D;
-        }
-
-        .header .welcome-text {
-            font-size: 12px;
-            opacity: 0.7;
-            letter-spacing: 2px;
-        }
-
-        /* ===== Layout 佈局 ===== */
-        .layout {
-            display: flex;
-            /* 修正 2：扣除 header 高度時，基準使用 100dvh */
-            height: calc(100dvh - 45px); 
-            width: 100%;
-            position: relative;
-        }
-
-        @media (min-width: 768px) {
-            /* 修正 3：桌面版同理 */
-            .layout { height: calc(100dvh - 60px); } 
-        }
-
-        /* ===== Sidebar 導航列 ===== */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 45px;
-            width: 250px;
-            /* 修正 4：Sidebar 也要配合 100dvh，否則底部會少一截或超出 */
-            height: calc(100dvh - 45px); 
-            background-color: #a3d9c9;
-            display: flex;
-            flex-direction: column;
-            z-index: 999;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .sidebar.active {
-            transform: translateX(0);
-        }
-
-        @media (min-width: 768px) {
-            .sidebar {
-                position: static;
-                width: 200px;
-                height: 100%;
-                transform: none;
-                box-shadow: none;
-            }
-        }
-
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .sidebar a {
-            padding: 14px 20px;
-            color: #0D0D0D;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            transition: all 0.2s;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-        }
-
-        .sidebar a:hover {
-            background: rgba(0, 0, 0, 0.1);
-            padding-left: 25px;
-        }
-
-        .sidebar-bottom-group {
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        #music-ui {
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        #music-ui img { width: 100%; height: 100%; object-fit: contain; }
-
-        .dog-container { width: 45px; }
-        .dog-container img { width: 100%; }
-
-        .sidebar-overlay {
-            position: fixed;
-            top: 45px; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 998;
-        }
-
-        .sidebar.active ~ .sidebar-overlay {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .content-area {
-            flex-grow: 1;
-            position: relative;
-            background: #000;
-        }
-
-        .content-area iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            border: none;
-        }
-    </style>
 </head>
 <body>
-    <audio id="bgm" loop preload="auto">
-        <source src="Music/Music.mp3" type="audio/mpeg">
-    </audio>
-
-    <div class="header-wrapper">
-        <button class="hamburger-btn" id="hamburger" aria-label="Menu">
-            <span></span><span></span><span></span>
-        </button>
-        <div class="header">
-            <div class="title">Project Zero / 零計畫</div>
-            <div class="welcome-text">Welcome</div>
-        </div>
+    <audio id="bgm" loop preload="auto"><source src="Music/Music.mp3" type="audio/mpeg"></audio>
+    <div class="header">
+        <div class="title">Project Zero / 零計畫</div>
+        <div class="welcome-text">Welcome</div>
     </div>
-
     <div class="layout">
-        <div class="sidebar" id="sidebar">
-            <div class="nav-links">
-                <a href="home.html" target="content-frame" class="nav-link">自介</a>
-                <a href="diary.html" target="content-frame" class="nav-link">日記</a>
-                <a href="blog.html" target="content-frame" class="nav-link">部落格</a>
-                <a href="gallery.html" target="content-frame" class="nav-link">相簿</a>
-                <a href="collections.html" target="content-frame" class="nav-link">收藏</a>
-                <a href="fortune.html" target="content-frame" class="nav-link">幸運指數</a>
-                <a href="festival.html" target="content-frame" class="nav-link">節慶</a>
-            </div>
-
+        <div class="sidebar">
+            <a href="home.html" target="content-frame">自介</a>
+            <a href="diary.html" target="content-frame">日記</a>
+            <a href="blog.html" target="content-frame">部落格</a>
+            <a href="gallery.html" target="content-frame">相簿</a>
+            <a href="collections.html" target="content-frame">收藏</a>
+            <a href="fortune.html" target="content-frame">幸運指數</a>
+            <a href="festival.html" target="content-frame">節慶</a>
             <div class="sidebar-bottom-group">
-                <div id="music-ui" onclick="togglePlay()" role="button" tabindex="0">
-                    <img id="btn-img" src="Music/IMG_3115.png" alt="Music">
-                </div>
-                <div class="dog-container">
-                    <img src="GIF_20251224164146204.gif" alt="Dog">
-                </div>
+                <div id="music-ui" onclick="togglePlay()"><img id="btn-img" src="Music/IMG_3115.png"></div>
+                <div class="dog-container"><img src="GIF_20251224164146204.gif"></div>
             </div>
         </div>
-
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-        <div class="content-area">
-            <iframe src="home.html" name="content-frame"></iframe>
-        </div>
+        <div class="content-area"><iframe src="home.html" name="content-frame"></iframe></div>
     </div>
-
     <script>
-        const hamburger = document.getElementById('hamburger');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        function toggleMenu() {
-            hamburger.classList.toggle('active');
-            sidebar.classList.toggle('active');
-        }
-
-        hamburger.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 768) toggleMenu();
-            });
-        });
-
         const audio = document.getElementById('bgm');
         const img = document.getElementById('btn-img');
-
-        function updateIcon() {
-            img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png";
-        }
-
-        function togglePlay() {
-            if (audio.paused) {
-                audio.play().then(updateIcon).catch(updateIcon);
-            } else {
-                audio.pause();
-                updateIcon();
-            }
-        }
-
-        document.addEventListener('click', () => {
-            if (audio.paused && audio.currentTime === 0) {
-                audio.play().then(updateIcon).catch(updateIcon);
-            }
-        }, { once: true });
+        function updateIcon() { img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png"; }
+        function togglePlay() { if (audio.paused) { audio.play().then(updateIcon); } else { audio.pause(); updateIcon(); } }
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('autoplay') === 'true') { audio.play().then(updateIcon).catch(updateIcon); }
+        };
+        document.querySelector('.sidebar').addEventListener('click', () => { if (audio.paused && audio.currentTime === 0) { audio.play().then(updateIcon); } }, { once: true });
     </script>
 </body>
 </html>
