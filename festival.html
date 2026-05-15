@@ -2,112 +2,35 @@
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <title>Project Zero | Birthday Celebration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Birthday Celebration</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     
     <style>
-        :root {
-            --primary-bg: #00F9C7;
-            --sidebar-bg: #a3d9c9;
-            --text-dark: #0D0D0D;
-            --header-h-mobile: 50px;
-            --header-h-desktop: 70px;
-            --sidebar-w-desktop: 220px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body, html {
+        
+        /* 嚴格鎖定 100%，不使用 dvh，完美適應 iframe */
+        body, html { 
             width: 100%; 
-            height: 100dvh; /* 確保不被手機網址列吃掉 */
-            overflow: hidden;
-            background: #000;
+            height: 100%; 
+            overflow: hidden; 
+            background: #000; 
             font-family: "Noto Sans TC", sans-serif;
         }
 
-        /* 版面配置 */
-        .layout {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .header-wrapper {
-            width: 100%;
-            height: var(--header-h-mobile);
-            background: var(--primary-bg);
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            z-index: 1000;
-            position: relative;
-        }
-
-        .header-title {
-            flex: 1;
-            font-size: clamp(16px, 4.5vw, 24px);
-            font-weight: 800;
-            color: var(--text-dark);
-        }
-
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* 漢堡選單 */
-        .menu-toggle {
-            width: 48px; height: 48px;
-            display: flex; flex-direction: column;
-            justify-content: center; gap: 6px;
-            cursor: pointer; border: none; background: none;
-            margin-right: 10px;
-        }
-        .menu-toggle span { width: 24px; height: 3px; background: var(--text-dark); border-radius: 2px; }
-
-        /* Sidebar 邏輯 */
-        .sidebar {
-            position: fixed;
-            top: var(--header-h-mobile);
-            left: -280px;
-            width: 280px;
-            height: calc(100% - var(--header-h-mobile));
-            background: var(--sidebar-bg);
-            transition: var(--transition);
-            z-index: 999;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .layout.active .sidebar { left: 0; }
-
-        .sidebar a {
-            display: flex; align-items: center;
-            padding: 15px 25px;
-            text-decoration: none; color: var(--text-dark);
-            font-weight: 600;
-        }
-
-        /* 畫布區域 */
-        .main-content {
-            flex: 1;
-            position: relative;
-            background: #000;
+        #canvas_container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             overflow: hidden;
         }
 
         #output_canvas {
-            width: 100%;
-            height: 100%;
             display: block;
+            width: 100%; height: 100%;
         }
 
-        /* 浮動 UI 文字 */
         .festival-ui {
             position: absolute;
             top: 20px;
@@ -115,66 +38,27 @@
             color: #00F9C7;
             z-index: 10;
             pointer-events: none;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            text-shadow: 0 0 8px rgba(0,0,0,0.8);
         }
 
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            opacity: 0; visibility: hidden; transition: var(--transition);
-            z-index: 998;
-        }
-        .layout.active .overlay { opacity: 1; visibility: visible; }
-
-        @media (min-width: 768px) {
-            .menu-toggle { display: none; }
-            .sidebar { position: static; left: 0; width: var(--sidebar-w-desktop); height: 100%; }
-            .header-wrapper { height: var(--header-h-desktop); padding: 0 40px; }
-        }
+        .festival-ui h2 { font-size: 18px; margin-bottom: 12px; font-weight: bold; }
+        .festival-ui p { font-size: 13px; margin-bottom: 8px; color: #a3d9c9; }
+        #status-text { font-size: 12px; color: #FFD700; letter-spacing: 1px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-<div class="layout" id="layout">
-    <div class="overlay" onclick="toggleMenu()"></div>
-
-    <header class="header-wrapper">
-        <button class="menu-toggle" onclick="toggleMenu()">
-            <span></span><span></span><span></span>
-        </button>
-        <div class="header-title">Project Zero / 零計畫</div>
-    </header>
-
-    <div class="main-container">
-        <nav class="sidebar">
-            <a href="#">首頁</a>
-            <a href="#">日記</a>
-            <a href="#">部落格</a>
-            <a href="#">相簿</a>
-            <a href="#">收藏</a>
-            <a href="#">幸運指數</a>
-            <a href="#">節慶</a>
-            <div style="margin-top: auto; padding: 20px; text-align: center;">
-                <small>v1.0.5 Centered Fix</small>
-            </div>
-        </nav>
-
-        <main class="main-content" id="canvas_container">
-            <div class="festival-ui">
-                <h2>Birthday Celebration🍰 5/17</h2>
-                <p id="status-text">握拳：聚集粒子 / 張手：散開粒子</p>
-            </div>
-            <canvas id="output_canvas"></canvas>
-            <video id="input_video" style="display:none;" playsinline></video>
-        </main>
+<div id="canvas_container">
+    <div class="festival-ui">
+        <h2>🎂 Birthday Celebration 🎂</h2>
+        <p>✊ 握拳：聚集驚喜 / 🖐️ 張手：散開粒子</p>
+        <div id="status-text">狀態：✨ 等待手勢中 ✨</div>
     </div>
+    <canvas id="output_canvas"></canvas>
+    <video id="input_video" style="display:none;" playsinline></video>
 </div>
 
 <script>
-    function toggleMenu() {
-        document.getElementById('layout').classList.toggle('active');
-    }
-
     const videoElement = document.getElementById('input_video');
     const canvasElement = document.getElementById('output_canvas');
     const canvasCtx = canvasElement.getContext('2d');
@@ -185,7 +69,6 @@
     const PARTICLE_COUNT = 1800; 
 
     function initText() {
-        // 同步畫布尺寸到實際容器大小
         const w = container.clientWidth;
         const h = container.clientHeight;
         canvasElement.width = w;
@@ -197,23 +80,24 @@
         
         tCtx.fillStyle = "white"; 
         tCtx.textAlign = "center";
+        tCtx.textBaseline = "middle";
         
-        // 微調字體大小，避免小螢幕超出
         const fontSize = Math.min(w / 8, 45); 
         tCtx.font = `bold ${fontSize}px Arial`;
         
-        // 基準點：強制鎖死在「畫面絕對正中央」
+        // 絕對正中央基準點
         const cx = w / 2;
         const cy = h / 2; 
         
-        // 固定像素距離，避免手機長寬比造成位移
-        tCtx.fillText("HAPPY BIRTHDAY", cx, cy - 70);
-        tCtx.fillText("TO ME", cx, cy - 20);
+        // 將文字與蛋糕整體往上提一點點，確保安全距離
+        const offsetY = -20; 
         
-        // 蛋糕緊跟在文字下方 50px 處
-        const cakeY = cy + 50; 
+        tCtx.fillText("HAPPY BIRTHDAY", cx, cy - 50 + offsetY);
+        tCtx.fillText("TO ME", cx, cy + offsetY);
         
-        // 繪製蛋糕形狀 (全部對齊 cakeY)
+        // 蛋糕基準高度
+        const cakeY = cy + 50 + offsetY; 
+        
         tCtx.fillRect(cx - 50, cakeY + 20, 100, 25); // 底
         tCtx.fillRect(cx - 35, cakeY, 70, 20);       // 中
         tCtx.fillRect(cx - 20, cakeY - 20, 40, 20);  // 頂
@@ -228,13 +112,12 @@
             tCtx.fill();
         });
 
-        // 讀取像素轉換為目標點
         const data = tCtx.getImageData(0, 0, w, h).data;
         textPoints = [];
         for (let y = 0; y < h; y += 2) {
             for (let x = 0; x < w; x += 2) {
                 if (data[(y * w + x) * 4 + 3] > 128) {
-                    textPoints.push({ x: x - w/2, y: y - h/2 });
+                    textPoints.push({ x: x - cx, y: y - cy });
                 }
             }
         }
@@ -253,7 +136,6 @@
             if (isFist && textPoints.length > 0) {
                 let pt = textPoints[this.id % textPoints.length];
                 
-                // ⚠️ 關鍵：不論手在哪裡，都強制把目標點設在畫面中心 (0.5)
                 let tx = canvasElement.width * 0.5 + pt.x;
                 let ty = canvasElement.height * 0.5 + pt.y;
                 
@@ -266,7 +148,6 @@
                 if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
                 if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
                 
-                // 張開手時，粒子會輕輕躲避手的座標
                 let dx = this.x - (currentHand.x * canvasElement.width);
                 let dy = this.y - (currentHand.y * canvasElement.height);
                 if (Math.hypot(dx, dy) > 200) { this.v.x -= dx * 0.001; this.v.y -= dy * 0.001; }
@@ -281,11 +162,7 @@
         }
     }
 
-    // 視窗縮放重新計算
-    window.addEventListener('resize', () => {
-        initText();
-    });
-
+    window.addEventListener('resize', initText);
     initText();
     for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
 
@@ -297,7 +174,6 @@
     }
     animate();
 
-    // 初始化 MediaPipe
     const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
     hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
     
@@ -308,11 +184,12 @@
             isFist = dist < 0.1; 
             currentHand = { x: 1 - h[9].x, y: h[9].y };
             
-            // 根據動作更新狀態文字
-            statusText.innerText = isFist ? "✨ 聚集驚喜中 ✨" : "握拳：聚集粒子 / 張手：散開粒子";
+            statusText.innerText = isFist ? "狀態：✨ 聚集驚喜中 ✨" : "狀態：🖐️ 粒子散開中";
+            statusText.style.color = isFist ? "#FFD700" : "#a3d9c9";
         } else { 
             isFist = false; 
-            statusText.innerText = "握拳：聚集粒子 / 張手：散開粒子";
+            statusText.innerText = "狀態：✨ 等待手勢中 ✨";
+            statusText.style.color = "#a3d9c9";
         }
     });
     
