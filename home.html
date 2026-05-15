@@ -1,242 +1,68 @@
 <!DOCTYPE html>
-
 <html lang="zh-Hant-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 12px; }
+        body { background: #000; color: #fff; padding: 15px; font-family: sans-serif; line-height: 1.6; }
+        
+        /* 任務 5：文字方框優化 */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 249, 199, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-width: 800px; /* 任務 3 */
+        }
 
+        .title { color: var(--primary, #00F9C7); font-size: 22px; margin-bottom: 15px; }
 
-    h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
+        /* 任務 7：社群按鈕 */
+        .social-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .social-group a {
+            color: #00F9C7; border: 1px solid #00F9C7;
+            padding: 8px 16px; border-radius: 6px; text-decoration: none;
+            font-size: 14px; min-height: 44px; display: flex; align-items: center;
+        }
 
-    .button-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
-    .btn { 
-        padding: 5px 8px; border: 1px solid rgba(0, 249, 199, 0.5); 
-        color: #00F9C7; text-decoration: none; font-size: 10px; 
-        border-radius: 3px; min-width: 60px; text-align: center;
-        background: rgba(0, 249, 199, 0.05);
-    }
+        /* 任務 4：圖片滑動牆 (核心修正) */
+        .slider {
+            display: flex; overflow-x: auto; gap: 12px;
+            scroll-snap-type: x mandatory; padding-bottom: 10px;
+            scrollbar-width: none; /* 隱藏捲軸 */
+        }
+        .slider::-webkit-scrollbar { display: none; }
+        .slider img {
+            flex: 0 0 150px; /* 手機版寬度 */
+            height: 150px; object-fit: cover;
+            border-radius: 8px; scroll-snap-align: start;
+        }
 
-    .card { 
-        border: 1px solid rgba(0, 249, 199, 0.2); border-radius: 6px; 
-        padding: 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); 
-    }
-    .card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
-    .card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
-
-    .image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-    .image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
-    
-    .image-grid::-webkit-scrollbar { display: none; }
-
-    .expandable-btn {
-        background: rgba(0, 249, 199, 0.05);
-        border: 1px solid rgba(0, 249, 199, 0.5);
-        color: #00F9C7;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        border-radius: 3px;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: bold;
-        width: 100%;
-        text-align: left;
-        transition: all 0.3s ease;
-    }
-    
-    .expandable-btn:hover {
-        background: rgba(0, 249, 199, 0.15);
-        transform: translateX(4px);
-    }
-    
-    .expandable-content {
-        display: none;
-        background: rgba(0, 249, 199, 0.05);
-        border-left: 3px solid #00F9C7;
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 0 6px 6px 0;
-        font-size: 11px;
-        line-height: 1.6;
-        color: #bbb;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-    
-    .expandable-content.active {
-        display: block;
-    }
-    
-    .expandable-content a {
-        color: #00F9C7;
-        text-decoration: none;
-        font-weight: bold;
-        word-break: break-all;
-    }
-    
-    .expandable-content a:hover {
-        text-decoration: underline;
-    }
-</style>
-
-
+        @media (min-width: 768px) {
+            .slider img { flex: 0 0 200px; height: 200px; }
+        }
+    </style>
 </head>
 <body>
-    <h2>歡迎回來</h2>
-    <div class="button-group">
-        <a href="https://www.instagram.com/qiuzhenyi0?igsh=MXYwdTJuMTh5cDN6MA%3D%3D&utm_source=qr" class="btn" target="_blank">
-            <i class="fab fa-instagram"></i> Instagram
-        </a>
-        <a href="https://www.facebook.com/share/1F43c66QWw/?mibextid=wwXIfr" class="btn" target="_blank">
-            <i class="fab fa-facebook"></i> Facebook
-        </a>
-        <a href="https://x.com/bairan_lin?s=21" class="btn" target="_blank">
-            <i class="fab fa-twitter"></i> X (Twitter)
-        </a>
+    <h2 class="title">歡迎回來</h2>
+    <div class="social-group">
+        <a href="#">Instagram</a> <a href="#">Facebook</a> <a href="#">X (Twitter)</a>
     </div>
 
-
-<div class="card">
-    <div class="card-title">自介</div>
-    <div class="card-text">
-        ⌗ 玲㿟染 / Bairan Lin<br>
-        ⌗ 台灣 | INTJ-T<br>
-        ⌗ 忌色,毒話題、沒有邊界感<br>
-        ⌗ Flourish / Zippo tricks 玩家<br>
-        ⌗ Python / HTML / C++ / JS<br>
-        ⌗ 無性戀<br>
-        ⌗ 夢想大學：成大資工、政大資工
+    <div class="card">
+        <h3 class="title">自介</h3>
+        <p># 玲帕染 / Bairan Lin</p>
+        <p># 台灣 | INTJ-T</p>
+        <p># Python / HTML / C++ / JS</p>
     </div>
-</div>
 
-<div class="card">
-    <div class="card-title">光遇 Sky</div>
-    <div class="card-text">
-        常駐林克長髮 | 無 cp 固玩監護 無雷<br>
-        淡遊小氪,雙號<br>
-        「自由只是你還未學習正確依附我時，暫時必要的累贅。」
+    <div class="card">
+        <h3 class="title">光遇工作室</h3>
+        <div class="slider">
+            <img src="your-image-1.jpg">
+            <img src="your-image-2.jpg">
+            <img src="your-image-3.jpg">
+            <img src="your-image-4.jpg">
+        </div>
     </div>
-</div>
-
-<div class="card">
-    <div class="card-title">光遇工作室</div>
-    <div class="card-title">以下自介卡皆由各團團長買斷製作,請勿抄襲,借鑑,盜圖</div>
-    <div class="card-title">——————————————————————𖤐</div>
-    <div class="image-grid">
-        <img src="`folder/琉璃.png" alt="小祈雜貨商">
-        <img src="`folder/𝑰.𝑷.𝑭 𝑨𝒔𝒚𝒍𝒖𝒎自介｜未斷.png" alt="">
-        <img src="`folder/IMG_1759.png" alt="默認頭像">
-    </div>
-</div>
-
-<button class="expandable-btn" onclick="toggleContent(this)">▸ AZR Systems</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>團長</strong></div>
-    <div style="margin-bottom: 10px;">AZR Systems | 你的創意實現廠牌
-
-
-設計 × 開發 × 代製 × 多多遊戲陪陪
-無論是美編卡面、客製網頁,小遊戲和機器人還是文件代做
-我們用心打造,精確訂製
-為您提供熱門遊戲陪玩
-有想法？找 AZR
-準備好改變了嗎？</div>
-<div>                                                    <a href="https://discord.gg/zf95kurcet" target="_blank">交給我們</a></div>
-</div>
-
-
-<button class="expandable-btn" onclick="toggleContent(this)">▸ ⋆.𐙚 ̊.小祈雜貨商ᯓᡣ𐭩</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>準團長</strong></div>
-    <div style="margin-bottom: 10px;">一家开在旧时光里的小店...☂
-
-
-在雨声里营业 贩售一点温柔和一点晴天
-一场小雨 一盏昏灯 一家…
-
-⋆.𐙚 ̊.小祈杂货商ᯓᡣ𐭩
-
-┄ ┄ ┄ ┄ ┄ ┄
-
-..招收中..
-代带 / 先祖 / 试炼 / 小金人
-獻祭 / 开图 / 代挂 / 卖心
-
-..卖心优惠..
-1 0 0 ♡ 送 1 5 ♡
-2 0 0 ♡ 送 2 5 ♡
-3 0 0 ♡ 送 3 5 ♡
-..依此类推..
-
-┄ ┄ ┄ ┄ ┄ ┄</div>
-<div>                                                    <a href="https://discord.gg/CCannzKcbh" target="_blank">推門而入？</a></div>
-</div>
-
-
-<button class="expandable-btn" onclick="toggleContent(this)">▸ ⿻𝑫𝑾 • 黎明</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>美編,策劃</strong></div>
-    <div style="margin-bottom: 10px;">𓂃 ࣪ ִֶָ  ⟡ 𝑫𝑾 • 黎明 ⟡ ִֶָ  ࣪ 𓂃
-
-
-他們說，黎明是一道光
-但我們知道——黎明，是一場審判⋯
-
-每一聲低語都會被聽見都將被回應
-
-⟡ 神恩福利輪替，祈福開啟就能應許你的願望
-⟡ 匿名聆聽池，每一道情緒都有回聲
-⟡ 限定活動不定期開放，你我之間永遠有故事未完
-⟡ 有可愛漂亮的團主和報酬獎勵喔！嗯！
-
-神話仍在延續
-
-《𝑫𝑾 • 黎明》在召喚你——
-你的回應，就是命運開始的聲音。
-
-「目前職缺」
-
-代帶、普陪、三戀xN
-板板xN
-
-詳細職務內容歡迎入團參考</div>
-<div>                                                    <a href="https://discord.gg/duUtqMeUCX" target="_blank">接受召喚</a></div>
-</div>
-
-
-<button class="expandable-btn" onclick="toggleContent(this)">▸ ༘⋆ 織戀夢𝐿𝑜𝑣𝑒𝑊𝑒𝑎𝑣𝑒₊ ⊹</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>美編</strong></div>
-    <div style="margin-bottom: 10px;">୨୧┈┈┈┈┈┈୨୧┈┈┈┈┈୨୧
-
-
-有人說
-夢境其實是一座收藏情感的花園
-
-初戀的悸動 暗戀的心跳
-還有那些不敢說出口的喜歡
-
-每當有人帶著期待入睡
-夢裡就會誕生一顆「夢糖」
-
-୨୧┈┈┈┈┈┈୨୧┈┈┈┈┈୨୧
-歡迎蒞臨「༘⋆ 織戀夢𝐿𝑜𝑣𝑒𝑊𝑒𝑎𝑣𝑒₊ ⊹」
-我們會在此永遠等著您</div>
-<div>                                                    <a href="https://discord.gg/MwtFd5Kbzp" target="_blank">成為夢糖</a></div>
-</div>
-
-
-<script>
-    function toggleContent(button) {
-        const content = button.nextElementSibling;
-        content.classList.toggle('active');
-        button.textContent = button.textContent.includes('▸') ? 
-            button.textContent.replace('▸', '▾') : 
-            button.textContent.replace('▾', '▸');
-    }
-</script>
-
-
 </body>
 </html>
