@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Project Zero | Responsive Pro</title>
+    <title>Project Zero | Birthday Celebration</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    
     <style>
-        /* ===== 任務 8：全局響應式變數系統 ===== */
         :root {
             --primary-bg: #00F9C7;
             --sidebar-bg: #a3d9c9;
@@ -24,7 +26,13 @@
             font-family: "Noto Sans TC", sans-serif;
         }
 
-        /* ===== 任務 1：Header 區域優化 ===== */
+        /* 版面配置 */
+        .layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
         .header-wrapper {
             width: 100%;
             height: var(--header-h-mobile);
@@ -34,43 +42,37 @@
             padding: 0 15px;
             z-index: 1000;
             position: relative;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .header-title {
             flex: 1;
-            font-size: clamp(16px, 4.5vw, 24px); /* 任務 1：防止超小螢幕過小 */
+            font-size: clamp(16px, 4.5vw, 24px);
             font-weight: 800;
             color: var(--text-dark);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
-        /* ===== 任務 2：漢堡選單按鈕 ===== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 漢堡選單 */
         .menu-toggle {
-            width: 48px; height: 48px; /* 任務 9：觸碰友善 */
+            width: 48px; height: 48px;
             display: flex; flex-direction: column;
             justify-content: center; gap: 6px;
             cursor: pointer; border: none; background: none;
             margin-right: 10px;
         }
+        .menu-toggle span { width: 24px; height: 3px; background: var(--text-dark); border-radius: 2px; }
 
-        .menu-toggle span {
-            width: 24px; height: 3px; background: var(--text-dark);
-            border-radius: 2px; transition: var(--transition);
-        }
-
-        /* 開啟狀態的 X 動畫 */
-        .active .menu-toggle span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
-        .active .menu-toggle span:nth-child(2) { opacity: 0; }
-        .active .menu-toggle span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
-
-        /* ===== 任務 2：Sidebar (手機版為側滑) ===== */
+        /* Sidebar 邏輯 */
         .sidebar {
             position: fixed;
             top: var(--header-h-mobile);
-            left: -280px; /* 預設隱藏 */
+            left: -280px;
             width: 280px;
             height: calc(100vh - var(--header-h-mobile));
             background: var(--sidebar-bg);
@@ -80,21 +82,40 @@
             display: flex;
             flex-direction: column;
         }
-
         .layout.active .sidebar { left: 0; }
 
         .sidebar a {
             display: flex; align-items: center;
             padding: 15px 25px;
-            min-height: 50px; /* 任務 2：觸碰高度 */
             text-decoration: none; color: var(--text-dark);
-            font-weight: 600; font-size: 16px;
-            transition: 0.2s;
+            font-weight: 600;
         }
 
-        .sidebar a:active { background: rgba(0,0,0,0.1); }
+        /* 畫布區域 */
+        .main-content {
+            flex: 1;
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
 
-        /* 遮罩層 */
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 浮動 UI 文字 */
+        .festival-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00F9C7;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5);
@@ -103,43 +124,10 @@
         }
         .layout.active .overlay { opacity: 1; visibility: visible; }
 
-        /* ===== 任務 3 & 4：內容區與 Slider 模板 ===== */
-        .main-content {
-            flex: 1; height: 100%;
-            padding: 12px; /* 手機版較窄 padding */
-        }
-
-        /* 任務 4：圖片滑動牆範例 */
-        .image-slider {
-            display: flex; gap: 10px;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            padding-bottom: 10px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .image-slider img {
-            height: 120px; /* 任務 4：手機版高度 */
-            scroll-snap-align: center;
-            border-radius: 8px;
-        }
-
-        /* ===== 桌面版適配 (768px+) ===== */
         @media (min-width: 768px) {
-            :root { --header-h-mobile: var(--header-h-desktop); }
-            
             .menu-toggle { display: none; }
-            
-            .sidebar {
-                position: static;
-                left: 0;
-                width: var(--sidebar-w-desktop);
-                height: 100%;
-            }
-
-            .header-wrapper { padding: 0 40px; }
-            
-            .image-slider img { height: 180px; } /* 桌面版圖片增高 */
+            .sidebar { position: static; left: 0; width: var(--sidebar-w-desktop); height: 100%; }
+            .header-wrapper { height: var(--header-h-desktop); padding: 0 40px; }
         }
     </style>
 </head>
@@ -155,24 +143,27 @@
         <div class="header-title">Project Zero / 零計畫</div>
     </header>
 
-    <div style="display: flex; height: calc(100vh - 50px);">
+    <div class="main-container">
         <nav class="sidebar">
             <a href="#">首頁</a>
             <a href="#">日記</a>
             <a href="#">部落格</a>
             <a href="#">相簿</a>
+            <a href="#">收藏</a>
+            <a href="#">幸運指數</a>
+            <a href="#">節慶</a>
             <div style="margin-top: auto; padding: 20px; text-align: center;">
-                <small>v1.0.2 Mobile Ready</small>
+                <small>v1.0.3 Responsive Fix</small>
             </div>
         </nav>
 
-        <main class="main-content">
-            <div class="image-slider">
-                <img src="https://via.placeholder.com/200x120?text=1" alt="1">
-                <img src="https://via.placeholder.com/200x120?text=2" alt="2">
-                <img src="https://via.placeholder.com/200x120?text=3" alt="3">
+        <main class="main-content" id="canvas_container">
+            <div class="festival-ui">
+                <h2>Birthday Celebration🍰 5/17</h2>
+                <p>握拳：聚集粒子 / 張手：散開粒子</p>
             </div>
-            <iframe src="about:blank" style="width:100%; height:80%; border:none; margin-top:20px;"></iframe>
+            <canvas id="output_canvas"></canvas>
+            <video id="input_video" style="display:none;" playsinline></video>
         </main>
     </div>
 </div>
@@ -181,7 +172,132 @@
     function toggleMenu() {
         document.getElementById('layout').classList.toggle('active');
     }
-</script>
 
+    const videoElement = document.getElementById('input_video');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const container = document.getElementById('canvas_container');
+    
+    let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
+    const PARTICLE_COUNT = 1800; 
+
+    function initText() {
+        // 同步畫布尺寸到實際容器大小
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        canvasElement.width = w;
+        canvasElement.height = h;
+
+        const tCanvas = document.createElement('canvas');
+        const tCtx = tCanvas.getContext('2d');
+        tCanvas.width = w; tCanvas.height = h;
+        
+        tCtx.fillStyle = "white"; 
+        tCtx.textAlign = "center";
+        
+        // 自適應字體大小
+        const fontSize = Math.min(w / 10, 50);
+        tCtx.font = `bold ${fontSize}px Arial`;
+        tCtx.fillText("HAPPY BIRTHDAY", w/2, h * 0.3);
+        tCtx.fillText("TO ME", w/2, h * 0.42);
+        
+        const cx = w/2;
+        const cy = h * 0.65; // 提高蛋糕位置，防止被手機底部切掉
+        
+        // 繪製蛋糕形狀
+        tCtx.fillRect(cx - 60, cy + 30, 120, 30); // 底
+        tCtx.fillRect(cx - 45, cy, 90, 30);       // 中
+        tCtx.fillRect(cx - 30, cy - 25, 60, 25);  // 頂
+        
+        tCtx.fillRect(cx - 22, cy - 40, 3, 15);   // 蠟燭 L
+        tCtx.fillRect(cx - 1.5, cy - 45, 3, 20); // 蠟燭 M
+        tCtx.fillRect(cx + 19, cy - 40, 3, 15);  // 蠟燭 R
+        
+        [[cx - 20, cy - 45, 3], [cx, cy - 52, 4], [cx + 20, cy - 45, 3]].forEach(p => {
+            tCtx.beginPath();
+            tCtx.arc(p[0], p[1], p[2], 0, Math.PI*2);
+            tCtx.fill();
+        });
+
+        const data = tCtx.getImageData(0, 0, w, h).data;
+        textPoints = [];
+        for (let y = 0; y < h; y += 2) {
+            for (let x = 0; x < w; x += 2) {
+                if (data[(y * w + x) * 4 + 3] > 128) {
+                    textPoints.push({ x: x - w/2, y: y - h/2 });
+                }
+            }
+        }
+    }
+
+    class Particle {
+        constructor(id) {
+            this.id = id;
+            this.x = Math.random() * window.innerWidth;
+            this.y = Math.random() * window.innerHeight;
+            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
+            this.hue = Math.random() * 40 + 330; 
+            this.bri = 50;
+        }
+        update() {
+            if (isFist && textPoints.length > 0) {
+                let pt = textPoints[this.id % textPoints.length];
+                let tx = currentHand.x * canvasElement.width + pt.x;
+                let ty = currentHand.y * canvasElement.height + pt.y;
+                this.x += (tx - this.x) * 0.15;
+                this.y += (ty - this.y) * 0.15;
+                this.bri = 60 + Math.random() * 40;
+            } else {
+                this.x += this.v.x;
+                this.y += this.v.y;
+                if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
+                if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
+                let dx = this.x - (currentHand.x * canvasElement.width);
+                let dy = this.y - (currentHand.y * canvasElement.height);
+                if (Math.hypot(dx, dy) > 200) { this.v.x -= dx * 0.001; this.v.y -= dy * 0.001; }
+                this.bri = 50;
+            }
+        }
+        draw() {
+            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
+            canvasCtx.beginPath();
+            canvasCtx.arc(this.x, this.y, isFist ? 2.2 : 1.5, 0, Math.PI*2);
+            canvasCtx.fill();
+        }
+    }
+
+    // 視窗縮放重新計算
+    window.addEventListener('resize', () => {
+        initText();
+    });
+
+    initText();
+    for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
+
+    function animate() {
+        canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
+        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+    hands.onResults(res => {
+        if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
+            const h = res.multiHandLandmarks[0];
+            const dist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y);
+            isFist = dist < 0.1; 
+            currentHand = { x: 1 - h[9].x, y: h[9].y };
+        } else { isFist = false; }
+    });
+    
+    const camera = new Camera(videoElement, { 
+        onFrame: async () => { await hands.send({image: videoElement}); }, 
+        width: 1280, height: 720 
+    });
+    camera.start();
+</script>
 </body>
 </html>
