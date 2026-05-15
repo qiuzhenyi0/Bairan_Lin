@@ -7,79 +7,80 @@
     <style>
         body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 12px; }
 
+```
+h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
 
-    h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
+.button-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+.btn { 
+    padding: 5px 8px; border: 1px solid rgba(0, 249, 199, 0.5); 
+    color: #00F9C7; text-decoration: none; font-size: 10px; 
+    border-radius: 3px; min-width: 60px; text-align: center;
+    background: rgba(0, 249, 199, 0.05);
+}
 
-    .button-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
-    .btn { 
-        padding: 5px 8px; border: 1px solid rgba(0, 249, 199, 0.5); 
-        color: #00F9C7; text-decoration: none; font-size: 10px; 
-        border-radius: 3px; min-width: 60px; text-align: center;
-        background: rgba(0, 249, 199, 0.05);
-    }
+.card { 
+    border: 1px solid rgba(0, 249, 199, 0.2); border-radius: 6px; 
+    padding: 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); 
+}
+.card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
+.card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
 
-    .card { 
-        border: 1px solid rgba(0, 249, 199, 0.2); border-radius: 6px; 
-        padding: 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); 
-    }
-    .card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
-    .card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
+.image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+.image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
 
-    .image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-    .image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
-    
-    .image-grid::-webkit-scrollbar { display: none; }
+.image-grid::-webkit-scrollbar { display: none; }
 
-    .expandable-btn {
-        background: rgba(0, 249, 199, 0.05);
-        border: 1px solid rgba(0, 249, 199, 0.5);
-        color: #00F9C7;
-        padding: 8px 12px;
-        margin-bottom: 8px;
-        border-radius: 3px;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: bold;
-        width: 100%;
-        text-align: left;
-        transition: all 0.3s ease;
-    }
-    
-    .expandable-btn:hover {
-        background: rgba(0, 249, 199, 0.15);
-        transform: translateX(4px);
-    }
-    
-    .expandable-content {
-        display: none;
-        background: rgba(0, 249, 199, 0.05);
-        border-left: 3px solid #00F9C7;
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 0 6px 6px 0;
-        font-size: 11px;
-        line-height: 1.6;
-        color: #bbb;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-    }
-    
-    .expandable-content.active {
-        display: block;
-    }
-    
-    .expandable-content a {
-        color: #00F9C7;
-        text-decoration: none;
-        font-weight: bold;
-        word-break: break-all;
-    }
-    
-    .expandable-content a:hover {
-        text-decoration: underline;
-    }
+.expandable-btn {
+    background: rgba(0, 249, 199, 0.05);
+    border: 1px solid rgba(0, 249, 199, 0.5);
+    color: #00F9C7;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    width: 100%;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.expandable-btn:hover {
+    background: rgba(0, 249, 199, 0.15);
+    transform: translateX(4px);
+}
+
+.expandable-content {
+    display: none;
+    background: rgba(0, 249, 199, 0.05);
+    border-left: 3px solid #00F9C7;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #bbb;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.expandable-content.active {
+    display: block;
+}
+
+.expandable-content a {
+    color: #00F9C7;
+    text-decoration: none;
+    font-weight: bold;
+    word-break: break-all;
+}
+
+.expandable-content a:hover {
+    text-decoration: underline;
+}
+```
+
 </style>
-
 
 </head>
 <body>
@@ -95,7 +96,6 @@
             <i class="fab fa-twitter"></i> X (Twitter)
         </a>
     </div>
-
 
 <div class="card">
     <div class="card-title">自介</div>
@@ -131,10 +131,10 @@
 </div>
 
 <button class="expandable-btn" onclick="toggleContent(this)">▸ AZR Systems</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
-    <div style="margin-bottom: 10px;">AZR Systems | 你的創意實現廠牌
 
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>團長</strong></div>
+    <div style="margin-bottom: 10px;">AZR Systems | 你的創意實現廠牌
 
 設計 × 開發 × 代製 × 多多遊戲陪陪
 無論是美編卡面、客製網頁,小遊戲和機器人還是文件代做
@@ -142,15 +142,15 @@
 為您提供熱門遊戲陪玩
 有想法？找 AZR
 準備好改變了嗎？</div>
-<div>🔗 <a href="https://discord.gg/zf95kurcet" target="_blank">交給我們</a></div>
+
+<div>                                                    <a href="https://discord.gg/zf95kurcet" target="_blank">交給我們</a></div>
 </div>
 
-
 <button class="expandable-btn" onclick="toggleContent(this)">▸ ⋆.𐙚 ̊.小祈雜貨商ᯓᡣ𐭩</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
-    <div style="margin-bottom: 10px;">一家开在旧时光里的小店...☂
 
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>準團長</strong></div>
+    <div style="margin-bottom: 10px;">一家开在旧时光里的小店...☂
 
 在雨声里营业 贩售一点温柔和一点晴天
 一场小雨 一盏昏灯 一家…
@@ -170,15 +170,15 @@
 ..依此类推..
 
 ┄ ┄ ┄ ┄ ┄ ┄</div>
-<div>🔗 <a href="https://discord.gg/CCannzKcbh" target="_blank">推門而入？</a></div>
+
+<div>                                                    <a href="https://discord.gg/CCannzKcbh" target="_blank">推門而入？</a></div>
 </div>
 
-
 <button class="expandable-btn" onclick="toggleContent(this)">▸ ⿻𝑫𝑾 • 黎明</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>⿻𝑫𝑾 • 黎明</strong></div>
-    <div style="margin-bottom: 10px;">𓂃 ࣪ ִֶָ  ⟡ 𝑫𝑾 • 黎明 ⟡ ִֶָ  ࣪ 𓂃
 
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>美編,策劃</strong></div>
+    <div style="margin-bottom: 10px;">𓂃 ࣪ ִֶָ  ⟡ 𝑫𝑾 • 黎明 ⟡ ִֶָ  ࣪ 𓂃
 
 他們說，黎明是一道光
 但我們知道——黎明，是一場審判⋯
@@ -201,15 +201,15 @@
 板板xN
 
 詳細職務內容歡迎入團參考</div>
-<div>🔗 <a href="https://discord.gg/duUtqMeUCX" target="_blank">接受召喚</a></div>
+
+<div>                                                    <a href="https://discord.gg/duUtqMeUCX" target="_blank">接受召喚</a></div>
 </div>
 
-
 <button class="expandable-btn" onclick="toggleContent(this)">▸ ༘⋆ 織戀夢𝐿𝑜𝑣𝑒𝑊𝑒𝑎𝑣𝑒₊ ⊹</button>
-<div class="expandable-content">
-    <div style="margin-bottom: 8px;"><strong>伺服器介紹</strong></div>
-    <div style="margin-bottom: 10px;">୨୧┈┈┈┈┈┈୨୧┈┈┈┈┈୨୧
 
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>美編</strong></div>
+    <div style="margin-bottom: 10px;">୨୧┈┈┈┈┈┈୨୧┈┈┈┈┈୨୧
 
 有人說
 夢境其實是一座收藏情感的花園
@@ -223,9 +223,9 @@
 ୨୧┈┈┈┈┈┈୨୧┈┈┈┈┈୨୧
 歡迎蒞臨「༘⋆ 織戀夢𝐿𝑜𝑣𝑒𝑊𝑒𝑎𝑣𝑒₊ ⊹」
 我們會在此永遠等著您</div>
-<div>🔗 <a href="https://discord.gg/MwtFd5Kbzp" target="_blank">成為夢糖</a></div>
-</div>
 
+<div>                                                    <a href="https://discord.gg/MwtFd5Kbzp" target="_blank">成為夢糖</a></div>
+</div>
 
 <script>
     function toggleContent(button) {
@@ -236,7 +236,6 @@
             button.textContent.replace('▾', '▸');
     }
 </script>
-
 
 </body>
 </html>
