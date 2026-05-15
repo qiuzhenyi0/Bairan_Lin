@@ -2,7 +2,7 @@
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>Project Zero | Birthday Celebration</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -21,7 +21,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body, html {
-            width: 100%; height: 100%; overflow: hidden;
+            width: 100%; 
+            /* 修正 1：使用 100dvh (動態視口高度)，解決手機底部被裁切的問題 */
+            height: 100dvh; 
+            /* 備用方案 */
+            min-height: 100%; 
+            overflow: hidden;
             background: #000;
             font-family: "Noto Sans TC", sans-serif;
         }
@@ -30,7 +35,7 @@
         .layout {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 100%; /* 繼承 body 的 100dvh */
         }
 
         .header-wrapper {
@@ -74,7 +79,7 @@
             top: var(--header-h-mobile);
             left: -280px;
             width: 280px;
-            height: calc(100vh - var(--header-h-mobile));
+            height: calc(100% - var(--header-h-mobile));
             background: var(--sidebar-bg);
             transition: var(--transition);
             z-index: 999;
@@ -153,7 +158,7 @@
             <a href="#">幸運指數</a>
             <a href="#">節慶</a>
             <div style="margin-top: auto; padding: 20px; text-align: center;">
-                <small>v1.0.3 Responsive Fix</small>
+                <small>v1.0.4 Height Fix</small>
             </div>
         </nav>
 
@@ -198,11 +203,13 @@
         // 自適應字體大小
         const fontSize = Math.min(w / 10, 50);
         tCtx.font = `bold ${fontSize}px Arial`;
-        tCtx.fillText("HAPPY BIRTHDAY", w/2, h * 0.3);
-        tCtx.fillText("TO ME", w/2, h * 0.42);
+        
+        // 修正 2：將文字與蛋糕整體往上提，遠離底部裁切區
+        tCtx.fillText("HAPPY BIRTHDAY", w/2, h * 0.28); // 從 0.3 提早到 0.28
+        tCtx.fillText("TO ME", w/2, h * 0.40);          // 從 0.42 提早到 0.40
         
         const cx = w/2;
-        const cy = h * 0.65; // 提高蛋糕位置，防止被手機底部切掉
+        const cy = h * 0.58; // 從 0.65 提早到 0.58，確保蛋糕完整顯示
         
         // 繪製蛋糕形狀
         tCtx.fillRect(cx - 60, cy + 30, 120, 30); // 底
