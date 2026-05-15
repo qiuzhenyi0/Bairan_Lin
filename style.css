@@ -1,203 +1,246 @@
-<!DOCTYPE html>
-<html lang="zh-Hant-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Birthday Celebration</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        /* 讓畫布完美填滿 iframe，不多不少 */
-        body, html { 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
-            background: #000; 
-            font-family: "Noto Sans TC", sans-serif;
-        }
+/* — 基礎設定 — */
+body {
+margin: 0;
+font-family: “Noto Sans TC”, “PingFang TC”, “Microsoft JhengHei”, sans-serif;
+background-color: #f4f4f4;
+overflow-x: hidden;
+}
 
-        #canvas_container {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-        }
+/* — 上方橫條 (Header) — */
+.header {
+width: 100%;
+background: #00F9C7; /* 薄荷綠 */
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 20px 40px;
+box-sizing: border-box;
+border-bottom: 2px solid rgba(0,0,0,0.1);
+}
 
-        canvas {
-            display: block;
-            width: 100%; height: 100%;
-        }
+.title {
+font-size: clamp(24px, 5vw, 42px); /* 隨螢幕縮放字體 */
+font-weight: 700;
+color: #0D0D0D;
+}
 
-        /* 浮動 UI 文字 */
-        .festival-ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #00F9C7;
-            z-index: 10;
-            pointer-events: none;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
-        }
-        
-        .festival-ui h2 { font-size: 18px; margin-bottom: 8px; }
-        .festival-ui p { font-size: 14px; color: #a3d9c9; }
-    </style>
-</head>
-<body>
+.numbers {
+font-size: 18px;
+opacity: 0.8;
+letter-spacing: 4px;
+}
 
-<div id="canvas_container">
-    <div class="festival-ui">
-        <h2>Birthday Celebration🍰 5/17</h2>
-        <p id="status-text">握拳：聚集粒子 / 張手：散開粒子</p>
-    </div>
-    <canvas id="output_canvas"></canvas>
-    <video id="input_video" style="display:none;" playsinline></video>
-</div>
+/* — 主體區域佈局 — */
+.layout {
+display: flex;
+min-height: calc(100vh - 100px);
+}
 
-<script>
-    const videoElement = document.getElementById('input_video');
-    const canvasElement = document.getElementById('output_canvas');
-    const canvasCtx = canvasElement.getContext('2d');
-    const container = document.getElementById('canvas_container');
-    const statusText = document.getElementById('status-text');
-    
-    let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
-    const PARTICLE_COUNT = 1800; 
+/* — 左側欄 (Sidebar) — */
+.sidebar {
+width: 200px;
+background: #A4D6CC;
+padding: 20px;
+box-sizing: border-box;
+display: flex;
+flex-direction: column;
+gap: 10px;
+flex-shrink: 0; /* 防止側邊欄被壓縮 */
+}
 
-    function initText() {
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        canvasElement.width = w;
-        canvasElement.height = h;
+.sidebar a {
+text-decoration: none;
+color: #111;
+font-size: 20px;
+padding: 10px;
+border-radius: 5px;
+transition: 0.3s ease;
+}
 
-        const tCanvas = document.createElement('canvas');
-        const tCtx = tCanvas.getContext('2d');
-        tCanvas.width = w; tCanvas.height = h;
-        
-        tCtx.fillStyle = "white"; 
-        tCtx.textAlign = "center";
-        tCtx.textBaseline = "middle";
-        
-        const fontSize = Math.min(w / 8, 45); 
-        tCtx.font = `bold ${fontSize}px Arial`;
-        
-        // 計算正中央基準點
-        const cx = w / 2;
-        const cy = h / 2; 
-        
-        // 繪製文字 (置中排版)
-        tCtx.fillText("HAPPY BIRTHDAY", cx, cy - 60);
-        tCtx.fillText("TO ME", cx, cy - 10);
-        
-        // 繪製蛋糕 (置中排版)
-        const cakeY = cy + 40; 
-        
-        tCtx.fillRect(cx - 45, cakeY + 20, 90, 25); // 底
-        tCtx.fillRect(cx - 30, cakeY, 60, 20);      // 中
-        tCtx.fillRect(cx - 15, cakeY - 20, 30, 20); // 頂
-        
-        tCtx.fillRect(cx - 12, cakeY - 35, 3, 15);  // 蠟燭 L
-        tCtx.fillRect(cx - 1.5, cakeY - 40, 3, 20); // 蠟燭 M
-        tCtx.fillRect(cx + 9, cakeY - 35, 3, 15);   // 蠟燭 R
-        
-        [[cx - 10.5, cakeY - 40, 3], [cx, cakeY - 47, 4], [cx + 10.5, cakeY - 40, 3]].forEach(p => {
-            tCtx.beginPath();
-            tCtx.arc(p[0], p[1], p[2], 0, Math.PI*2);
-            tCtx.fill();
-        });
+.sidebar a:hover {
+background: rgba(255, 255, 255, 0.3);
+transform: translateX(8px);
+color: #008B74;
+}
 
-        // 擷取座標並轉為相對偏移量
-        const data = tCtx.getImageData(0, 0, w, h).data;
-        textPoints = [];
-        for (let y = 0; y < h; y += 2) {
-            for (let x = 0; x < w; x += 2) {
-                if (data[(y * w + x) * 4 + 3] > 128) {
-                    textPoints.push({ x: x - cx, y: y - cy });
-                }
-            }
-        }
-    }
+.dog-container {
+margin-top: auto; /* 讓小狗固定在側邊欄底部 */
+padding: 20px 0;
+text-align: center;
+}
 
-    class Particle {
-        constructor(id) {
-            this.id = id;
-            this.x = Math.random() * window.innerWidth;
-            this.y = Math.random() * window.innerHeight;
-            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
-            this.hue = Math.random() * 40 + 330; 
-            this.bri = 50;
-        }
-        update() {
-            if (isFist && textPoints.length > 0) {
-                let pt = textPoints[this.id % textPoints.length];
-                
-                // ⚠️ 修正核心：不管手在哪裡，強制把文字生成在螢幕「正中央」
-                let tx = canvasElement.width * 0.5 + pt.x;
-                let ty = canvasElement.height * 0.5 + pt.y;
-                
-                this.x += (tx - this.x) * 0.15;
-                this.y += (ty - this.y) * 0.15;
-                this.bri = 60 + Math.random() * 40;
-            } else {
-                this.x += this.v.x;
-                this.y += this.v.y;
-                if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
-                if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
-                
-                // 張開手時，粒子會輕輕躲避手的座標
-                let dx = this.x - (currentHand.x * canvasElement.width);
-                let dy = this.y - (currentHand.y * canvasElement.height);
-                if (Math.hypot(dx, dy) > 200) { this.v.x -= dx * 0.001; this.v.y -= dy * 0.001; }
-                this.bri = 50;
-            }
-        }
-        draw() {
-            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
-            canvasCtx.beginPath();
-            canvasCtx.arc(this.x, this.y, isFist ? 2.2 : 1.5, 0, Math.PI*2);
-            canvasCtx.fill();
-        }
-    }
+.sidebar-dog {
+width: 80px;
+height: auto;
+filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.1));
+}
 
-    window.addEventListener('resize', initText);
-    initText();
-    for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
+/* — 內容區 (Content) — */
+.content {
+flex: 1;
+background-color: #0D0D0D; /* 深色背景 */
+color: #FFFFFF;
+padding: 30px;
+display: flex;
+flex-direction: column;
+gap: 25px;
+max-width: calc(100vw - 200px); /* 限制最大寬度防止圖片撐爆 */
+box-sizing: border-box;
+}
 
-    function animate() {
-        canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
-        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-        particles.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-    }
-    animate();
+h1 {
+font-size: 28px;
+margin-bottom: 10px;
+border-bottom: 1px solid #333;
+padding-bottom: 10px;
+}
 
-    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-    
-    hands.onResults(res => {
-        if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
-            const h = res.multiHandLandmarks[0];
-            const dist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y);
-            isFist = dist < 0.1; 
-            currentHand = { x: 1 - h[9].x, y: h[9].y };
-            
-            // 動態更新狀態文字
-            statusText.innerText = isFist ? "✨ 聚集驚喜中 ✨" : "握拳：聚集粒子 / 張手：散開粒子";
-            statusText.style.color = isFist ? "#FFD700" : "#a3d9c9";
-        } else { 
-            isFist = false; 
-            statusText.innerText = "握拳：聚集粒子 / 張手：散開粒子";
-            statusText.style.color = "#a3d9c9";
-        }
-    });
-    
-    const camera = new Camera(videoElement, { 
-        onFrame: async () => { await hands.send({image: videoElement}); }, 
-        width: 1280, height: 720 
-    });
-    camera.start();
-</script>
-</body>
-</html>
+/* 1. 社群連結 */
+.social-module {
+display: flex;
+justify-content: flex-start;
+gap: 20px;
+padding: 15px;
+border: 1px solid #333;
+border-radius: 10px;
+background: #1a1a1a;
+}
+
+.social-icon {
+text-decoration: none;
+font-size: 22px;
+color: #00F9C7;
+font-weight: bold;
+transition: 0.3s;
+}
+
+.social-icon:hover {
+color: #FFFFFF;
+transform: translateY(-3px);
+}
+
+/* 2. 文字區域 */
+.text-area {
+background: #1a1a1a;
+border-left: 5px solid #6599A5;
+padding: 20px;
+border-radius: 0 10px 10px 0;
+line-height: 1.8;
+color: #AFE2DE;
+}
+
+.text-area p { margin: 5px 0; }
+
+.sky-section {
+border-left-color: #87CEEB;
+background: #111e25; /* 微微的深藍調 */
+}
+
+/* 3. 日曆與今日事項 (字體加大) */
+.calendar-container {
+background: #1a1a1a;
+border: 1px solid #333;
+padding: 20px;
+border-radius: 10px;
+}
+
+#current-date-display {
+font-size: 18px;
+font-weight: bold;
+margin-bottom: 15px;
+color: #8BC6B4;
+}
+
+.today-task {
+width: 100%;
+min-height: 100px;
+font-size: 28px; /* 依照要求加大 */
+font-weight: 900;
+color: #00F9C7;
+background: transparent;
+border: 1px dashed #444;
+padding: 15px;
+box-sizing: border-box;
+font-family: inherit;
+resize: vertical;
+outline: none;
+}
+
+/* 4. 圖片滑動牆 (關鍵修正) */
+.image-slider {
+width: 100%;
+background: #1a1a1a;
+border-radius: 10px;
+padding: 15px;
+box-sizing: border-box;
+overflow: hidden; /* 隱藏外溢 */
+}
+
+.slider-title {
+font-size: 16px;
+color: #888;
+margin-bottom: 15px;
+padding-left: 5px;
+}
+
+.slides {
+display: flex;
+overflow-x: auto; /* 啟用水平滑動 */
+gap: 15px;
+padding-bottom: 10px;
+scrollbar-width: thin; /* Firefox */
+scrollbar-color: #333 transparent;
+}
+
+/* 隱藏捲軸但保持滑動 (Chrome/Safari) */
+.slides::-webkit-scrollbar {
+height: 6px;
+}
+.slides::-webkit-scrollbar-thumb {
+background: #333;
+border-radius: 10px;
+}
+
+.slides img {
+height: 180px; /* 固定高度 */
+width: auto;   /* 寬度自適應比例 */
+flex-shrink: 0; /* 關鍵：防止圖片被擠壓 */
+border-radius: 8px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+transition: transform 0.3s ease;
+cursor: pointer;
+}
+
+.slides img:hover {
+transform: scale(1.03);
+}
+
+.slider-controls {
+text-align: center;
+font-size: 12px;
+color: #555;
+margin-top: 10px;
+}
+
+/* — 響應式調整 (手機版) — */
+@media (max-width: 768px) {
+.layout {
+flex-direction: column; /* 側邊欄變頂部或隱藏 */
+}
+.sidebar {
+width: 100%;
+flex-direction: row;
+overflow-x: auto;
+white-space: nowrap;
+}
+.content {
+max-width: 100vw;
+padding: 15px;
+}
+.slides img {
+height: 140px; /* 手機上縮小圖片高度 */
+}
+.today-task {
+font-size: 22px;
+}
+}
