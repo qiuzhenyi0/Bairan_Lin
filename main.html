@@ -5,137 +5,309 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Project Zero</title>
     <style>
-        /* ===== 任務 8：響應式變數與基礎設定 ===== */
-        :root {
-            --primary: #00F9C7;
-            --sidebar-bg: #a3d9c9;
-            --header-h: 50px;
-            --sidebar-w: 200px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* ===== 全局基礎設定 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { 
-            width: 100%; height: 100%; overflow: hidden; 
-            background: #000; font-family: "Noto Sans TC", sans-serif; 
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
         }
 
-        /* ===== 任務 1：Header 優化 ===== */
+        /* ===== Header 區域 ===== */
         .header-wrapper {
-            width: 100%; height: var(--header-h); background: var(--primary);
-            display: flex; align-items: center; padding: 0 15px;
-            z-index: 1002; position: relative;
+            width: 100%;
+            background: #00F9C7;
+            display: flex;
+            align-items: center;
+            height: 45px;
+            position: relative;
+            z-index: 1000;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
         }
 
-        .header-title {
-            flex: 1; font-size: clamp(16px, 4.5vw, 22px);
-            font-weight: 700; color: #0D0D0D;
+        /* --- 漢堡選單按鈕 (任務 2 優化) --- */
+        .hamburger-btn {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px 12px;
+            z-index: 1001;
+            width: 50px;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
 
-        .welcome-text { font-size: 12px; opacity: 0.7; letter-spacing: 2px; }
-
-        /* --- 漢堡選單 (任務 2) --- */
-        .hamburger {
-            width: 45px; height: 100%; display: flex; flex-direction: column;
-            justify-content: center; gap: 5px; cursor: pointer; border: none; background: none;
+        /* 修正：當選單開啟時背景色與側邊欄一致 */
+        .hamburger-btn.active {
+            background-color: #a3d9c9;
         }
-        .hamburger span {
-            width: 24px; height: 3px; background: #0D0D0D;
-            border-radius: 2px; transition: var(--transition);
+
+        .hamburger-btn span {
+            width: 24px;
+            height: 3px;
+            background: #0D0D0D;
+            border-radius: 2px;
+            transition: all 0.3s ease;
         }
-        /* 變形成 X 的修正 (任務 2) */
-        .active .hamburger span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-        .active .hamburger span:nth-child(2) { opacity: 0; }
-        .active .hamburger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-        @media (min-width: 768px) { .hamburger { display: none; } }
+        /* 修正：X 圖示旋轉角度與位移 (任務 2) */
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
 
-        /* ===== 任務 2：Sidebar 抽屜式設計 ===== */
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        @media (min-width: 768px) {
+            .hamburger-btn { display: none; }
+            .header-wrapper { height: 60px; }
+        }
+
+        .header {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+        }
+
+        .header .title {
+            font-size: clamp(16px, 4vw, 32px);
+            font-weight: 700;
+            color: #0D0D0D;
+        }
+
+        .header .welcome-text {
+            font-size: 12px;
+            opacity: 0.7;
+            letter-spacing: 2px;
+        }
+
+        /* ===== Layout 佈局 ===== */
+        .layout {
+            display: flex;
+            height: calc(100vh - 45px);
+            width: 100%;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .layout { height: calc(100vh - 60px); }
+        }
+
+        /* ===== Sidebar 導航列 ===== */
         .sidebar {
-            position: fixed; top: var(--header-h); left: -100%; /* 預設藏起來 */
-            width: 260px; height: calc(100vh - var(--header-h));
-            background: var(--sidebar-bg); z-index: 1001;
-            transition: var(--transition); display: flex; flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 45px;
+            width: 250px;
+            height: calc(100vh - 45px);
+            background-color: #a3d9c9;
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
         }
-        .active .sidebar { left: 0; }
 
-        .nav-links { flex: 1; padding: 20px 0; }
-        .sidebar a {
-            display: block; padding: 15px 25px; color: #0D0D0D;
-            text-decoration: none; font-weight: 600; min-height: 48px; /* 任務 9 */
+        .sidebar.active {
+            transform: translateX(0);
         }
-        .sidebar a:active { background: rgba(0,0,0,0.1); }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                position: static;
+                width: 200px;
+                height: 100%;
+                transform: none;
+                box-shadow: none;
+            }
+        }
+
+        /* 導航連結容器 */
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .sidebar a {
+            padding: 14px 20px;
+            color: #0D0D0D;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar a:hover {
+            background: rgba(0, 0, 0, 0.1);
+            padding-left: 25px;
+        }
+
+        /* 側邊欄底部控制 */
+        .sidebar-bottom-group {
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #music-ui {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #music-ui img { width: 100%; height: 100%; object-fit: contain; }
+
+        .dog-container { width: 45px; }
+        .dog-container img { width: 100%; }
 
         /* 遮罩層 */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden;
-            transition: var(--transition); z-index: 1000;
-        }
-        .active .overlay { opacity: 1; visibility: visible; }
-
-        /* ===== 內容區佈局 ===== */
-        .layout { display: flex; height: calc(100vh - var(--header-h)); width: 100%; }
-        .content-area { flex: 1; position: relative; background: #000; }
-        iframe { width: 100%; height: 100%; border: none; }
-
-        /* 桌面版恢復靜態側邊欄 (任務 8) */
-        @media (min-width: 768px) {
-            .sidebar { position: static; width: var(--sidebar-w); left: 0; }
-            .overlay { display: none; }
+        .sidebar-overlay {
+            position: fixed;
+            top: 45px; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 998;
         }
 
-        /* 音樂/狗狗組件 */
-        .sidebar-bottom { padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        #music-ui img { width: 60px; cursor: pointer; transition: 0.3s; }
-        .dog-container img { width: 45px; }
+        .sidebar.active ~ .sidebar-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 內容區 */
+        .content-area {
+            flex-grow: 1;
+            position: relative;
+            background: #000;
+        }
+
+        .content-area iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
+    <audio id="bgm" loop preload="auto">
+        <source src="Music/Music.mp3" type="audio/mpeg">
+    </audio>
 
-<audio id="bgm" loop><source src="Music/Music.mp3" type="audio/mpeg"></audio>
-
-<div id="main-layout">
-    <div class="overlay" onclick="toggleMenu()"></div>
-    
-    <header class="header-wrapper">
-        <button class="hamburger" onclick="toggleMenu()">
+    <div class="header-wrapper">
+        <button class="hamburger-btn" id="hamburger" aria-label="Menu">
             <span></span><span></span><span></span>
         </button>
-        <div class="header-title">Project Zero / 零計畫</div>
-        <div class="welcome-text">Welcome</div>
-    </header>
+        <div class="header">
+            <div class="title">Project Zero / 零計畫</div>
+            <div class="welcome-text">Welcome</div>
+        </div>
+    </div>
 
     <div class="layout">
-        <nav class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="nav-links">
-                <a href="home.html" target="content-frame">自介</a>
-                <a href="diary.html" target="content-frame">日記</a>
-                <a href="blog.html" target="content-frame">部落格</a>
-                <a href="gallery.html" target="content-frame">相簿</a>
-                <a href="collections.html" target="content-frame">收藏</a>
+                <a href="home.html" target="content-frame" class="nav-link">自介</a>
+                <a href="diary.html" target="content-frame" class="nav-link">日記</a>
+                <a href="blog.html" target="content-frame" class="nav-link">部落格</a>
+                <a href="gallery.html" target="content-frame" class="nav-link">相簿</a>
+                <a href="collections.html" target="content-frame" class="nav-link">收藏</a>
+                <a href="fortune.html" target="content-frame" class="nav-link">幸運指數</a>
+                <a href="festival.html" target="content-frame" class="nav-link">節慶</a>
             </div>
-            <div class="sidebar-bottom">
-                <div id="music-ui" onclick="togglePlay()"><img id="btn-img" src="Music/IMG_3115.png"></div>
-                <div class="dog-container"><img src="GIF_20251224164146204.gif"></div>
-            </div>
-        </nav>
-        <main class="content-area">
-            <iframe src="home.html" name="content-frame"></iframe>
-        </main>
-    </div>
-</div>
 
-<script>
-    function toggleMenu() { document.getElementById('main-layout').classList.toggle('active'); }
-    
-    // 音樂控制邏輯
-    const audio = document.getElementById('bgm');
-    const img = document.getElementById('btn-img');
-    function togglePlay() {
-        if (audio.paused) { audio.play(); img.src = "Music/IMG_3116.png"; }
-        else { audio.pause(); img.src = "Music/IMG_3115.png"; }
-    }
-</script>
+            <div class="sidebar-bottom-group">
+                <div id="music-ui" onclick="togglePlay()" role="button" tabindex="0">
+                    <img id="btn-img" src="Music/IMG_3115.png" alt="Music">
+                </div>
+                <div class="dog-container">
+                    <img src="GIF_20251224164146204.gif" alt="Dog">
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <div class="content-area">
+            <iframe src="home.html" name="content-frame"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function toggleMenu() {
+            hamburger.classList.toggle('active');
+            sidebar.classList.toggle('active');
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+
+        // 點擊連結後自動收起選單
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768) toggleMenu();
+            });
+        });
+
+        // 音樂控制
+        const audio = document.getElementById('bgm');
+        const img = document.getElementById('btn-img');
+
+        function updateIcon() {
+            img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png";
+        }
+
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play().then(updateIcon).catch(updateIcon);
+            } else {
+                audio.pause();
+                updateIcon();
+            }
+        }
+
+        // 首次點擊啟動播放
+        document.addEventListener('click', () => {
+            if (audio.paused && audio.currentTime === 0) {
+                audio.play().then(updateIcon).catch(updateIcon);
+            }
+        }, { once: true });
+    </script>
 </body>
 </html>
