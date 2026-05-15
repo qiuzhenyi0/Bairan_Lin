@@ -3,64 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Project Zero | Birthday Celebration Fix</title>
+    <title>Project Zero | Birthday Celebration</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <style>
         :root {
             --primary-bg: #00F9C7;
-            --sidebar-bg: #a3d9c9;
-            --text-dark: #0D0D0D;
-            --header-h: 60px;
-            --sidebar-w: 220px;
+            --sidebar-bg: #1A4D40; /* 配合你截圖中的深綠色 */
+            --text-light: #FFFFFF;
+            --header-h: 70px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: "Noto Sans TC", sans-serif; }
 
+        /* 整體佈局 */
         .layout { display: flex; flex-direction: column; height: 100vh; }
-        .header { height: var(--header-h); background: var(--primary-bg); display: flex; align-items: center; padding: 0 15px; z-index: 100; }
-        .header-title { font-weight: bold; font-size: 20px; }
-
-        .main-container { display: flex; flex: 1; position: relative; overflow: hidden; }
         
-        /* 手機版 Sidebar 預設隱藏 */
-        .sidebar { width: var(--sidebar-w); background: var(--sidebar-bg); height: 100%; transition: 0.3s; }
-        @media (max-width: 768px) {
-            .sidebar { position: absolute; left: -220px; z-index: 50; }
-            .layout.active .sidebar { left: 0; }
+        /* 頂部導覽列 (配合截圖樣式) */
+        .header { 
+            height: var(--header-h); 
+            background: var(--primary-bg); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 25px; 
+            font-size: 24px; 
+            font-weight: 900; 
+            color: #000;
+            z-index: 100;
         }
 
-        .main-content { flex: 1; position: relative; background: #000; }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* 左側側邊欄 (配合截圖樣式) */
+        .sidebar { 
+            width: 180px; 
+            background: var(--sidebar-bg); 
+            display: flex; 
+            flex-direction: column; 
+            padding-top: 20px;
+        }
+        .sidebar-item { 
+            padding: 15px 25px; 
+            color: var(--text-light); 
+            text-decoration: none; 
+            font-weight: bold;
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        .sidebar-item.active { background: rgba(255,255,255,0.1); opacity: 1; border-right: 4px solid var(--primary-bg); }
+
+        /* 右側畫布內容 */
+        .main-content { flex: 1; position: relative; background: #000; overflow: hidden; }
         #output_canvas { width: 100%; height: 100%; display: block; }
 
+        /* 粒子狀態顯示 */
         .festival-ui {
-            position: absolute; top: 15px; left: 15px; color: var(--primary-bg);
-            z-index: 10; pointer-events: none; text-shadow: 0 0 8px rgba(0,0,0,0.8);
+            position: absolute; top: 25px; left: 25px; 
+            color: var(--primary-bg); z-index: 10; 
+            pointer-events: none; text-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
-        
-        /* 漢堡按鈕 */
-        .menu-btn { padding: 10px; cursor: pointer; margin-right: 10px; background: none; border: 1px solid #000; border-radius: 4px; }
+        #status { font-size: 14px; opacity: 0.8; margin-top: 5px; }
+
+        /* 手機適配：自動隱藏 Sidebar */
+        @media (max-width: 768px) {
+            .sidebar { width: 0; display: none; }
+        }
     </style>
 </head>
 <body>
 
-<div class="layout" id="layout">
-    <header class="header">
-        <button class="menu-btn" onclick="document.getElementById('layout').classList.toggle('active')">選單</button>
-        <div class="header-title">Project Zero / 零計畫</div>
-    </header>
+<div class="layout">
+    <header class="header">Project Zero / 零計畫</header>
 
     <div class="main-container">
         <nav class="sidebar">
-            <div style="padding: 20px;">
-                <p>首頁</p><br><p>日記</p><br><p>節慶 (當前)</p>
-            </div>
+            <a href="#" class="sidebar-item">自介</a>
+            <a href="#" class="sidebar-item">日記</a>
+            <a href="#" class="sidebar-item">部落格</a>
+            <a href="#" class="sidebar-item">相簿</a>
+            <a href="#" class="sidebar-item">收藏</a>
+            <a href="#" class="sidebar-item">幸運指數</a>
+            <a href="#" class="sidebar-item active">節慶</a>
         </nav>
 
         <main class="main-content" id="canvas_parent">
             <div class="festival-ui">
                 <h2>Birthday Celebration🍰 5/17</h2>
-                <p id="status">等待相機啟動...</p>
+                <div id="status">正在啟動感應鏡頭...</div>
             </div>
             <canvas id="output_canvas"></canvas>
             <video id="input_video" style="display:none;" playsinline></video>
@@ -79,8 +108,8 @@
     let currentHand = { x: 0.5, y: 0.5 };
     const PARTICLE_COUNT = 1600; 
 
+    // 初始化文字點雲
     function initText() {
-        // 重要：根據容器實際大小設定 Canvas 分辨率
         const w = parent.clientWidth;
         const h = parent.clientHeight;
         canvasElement.width = w;
@@ -93,30 +122,30 @@
         tCtx.fillStyle = "white"; 
         tCtx.textAlign = "center";
         
-        const fontSize = Math.min(w / 9, 45);
+        // 字體縮放
+        const fontSize = Math.min(w / 10, 55);
         tCtx.font = `bold ${fontSize}px Arial`;
-        tCtx.fillText("HAPPY BIRTHDAY", w/2, h * 0.3);
-        tCtx.fillText("TO ME", w/2, h * 0.4);
+        tCtx.fillText("HAPPY BIRTHDAY", w/2, h * 0.35);
+        tCtx.fillText("TO ME", w/2, h * 0.46);
         
         const cx = w/2;
-        const cy = h * 0.62; 
+        const cy = h * 0.7; // 蛋糕位置稍微調低，看起來比較穩
         
-        // 蛋糕體
-        tCtx.fillRect(cx - 60, cy + 30, 120, 30);
-        tCtx.fillRect(cx - 45, cy, 90, 30);
-        tCtx.fillRect(cx - 30, cy - 25, 60, 25);
-        // 蠟燭
-        tCtx.fillRect(cx - 22, cy - 42, 3, 18);
-        tCtx.fillRect(cx - 1, cy - 48, 3, 24);
-        tCtx.fillRect(cx + 20, cy - 42, 3, 18);
-        // 火苗
-        [ [cx-20, cy-45], [cx+1, cy-53], [cx+22, cy-45] ].forEach(p => {
-            tCtx.beginPath(); tCtx.arc(p[0], p[1], 4, 0, Math.PI*2); tCtx.fill();
+        // 蛋糕細節繪製
+        tCtx.fillRect(cx - 70, cy + 30, 140, 35);
+        tCtx.fillRect(cx - 55, cy - 5, 110, 35);
+        tCtx.fillRect(cx - 35, cy - 35, 70, 30);
+        // 蠟燭與火
+        tCtx.fillRect(cx - 25, cy - 55, 4, 20);
+        tCtx.fillRect(cx - 2, cy - 62, 4, 27);
+        tCtx.fillRect(cx + 21, cy - 55, 4, 20);
+        [ [cx-23, cy-58], [cx, cy-65], [cx+23, cy-58] ].forEach(p => {
+            tCtx.beginPath(); tCtx.arc(p[0], p[1], 5, 0, Math.PI*2); tCtx.fill();
         });
 
         const data = tCtx.getImageData(0, 0, w, h).data;
         textPoints = [];
-        for (let y = 0; y < h; y += 3) { // 稍微加大取樣間隔提升效能
+        for (let y = 0; y < h; y += 3) {
             for (let x = 0; x < w; x += 3) {
                 if (data[(y * w + x) * 4 + 3] > 128) {
                     textPoints.push({ x: x - w/2, y: y - h/2 });
@@ -128,18 +157,18 @@
     class Particle {
         constructor(id) {
             this.id = id;
-            this.x = Math.random() * window.innerWidth;
-            this.y = Math.random() * window.innerHeight;
-            this.v = { x: (Math.random()-0.5)*4, y: (Math.random()-0.5)*4 };
-            this.hue = Math.random() * 40 + 330; 
+            this.x = Math.random() * parent.clientWidth;
+            this.y = Math.random() * parent.clientHeight;
+            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
+            this.hue = Math.random() * 40 + 330; // 桃粉色調
         }
         update() {
             if (isFist && textPoints.length > 0) {
                 let pt = textPoints[this.id % textPoints.length];
                 let tx = currentHand.x * canvasElement.width + pt.x;
                 let ty = currentHand.y * canvasElement.height + pt.y;
-                this.x += (tx - this.x) * 0.2; // 增加反應速度
-                this.y += (ty - this.y) * 0.2;
+                this.x += (tx - this.x) * 0.18;
+                this.y += (ty - this.y) * 0.18;
             } else {
                 this.x += this.v.x;
                 this.y += this.v.y;
@@ -148,9 +177,9 @@
             }
         }
         draw() {
-            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${isFist ? 75 : 50}%)`;
+            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${isFist ? 70 : 50}%)`;
             canvasCtx.beginPath();
-            canvasCtx.arc(this.x, this.y, isFist ? 2 : 1.5, 0, Math.PI*2);
+            canvasCtx.arc(this.x, this.y, isFist ? 2.2 : 1.5, 0, Math.PI*2);
             canvasCtx.fill();
         }
     }
@@ -160,36 +189,33 @@
     for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
 
     function animate() {
-        canvasCtx.fillStyle = "rgba(0,0,0,0.15)";
+        canvasCtx.fillStyle = "rgba(0,0,0,0.18)";
         canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
         particles.forEach(p => { p.update(); p.draw(); });
         requestAnimationFrame(animate);
     }
     animate();
 
+    // MediaPipe Hands 設定
     const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
     hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
     
     hands.onResults(res => {
-        statusText.innerText = "偵測中：請嘗試握拳";
         if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
             const h = res.multiHandLandmarks[0];
-            
-            // 靈敏版握拳偵測：食指(8)與中指(12)尖端 y 座標大於 指根(6, 10) 代表手指收起
-            const fistDetection = h[8].y > h[6].y && h[12].y > h[10].y;
-            isFist = fistDetection; 
-
-            // 修正座標映射
+            // 握拳邏輯修正
+            isFist = h[8].y > h[6].y && h[12].y > h[10].y && h[16].y > h[14].y; 
             currentHand = { x: 1 - h[9].x, y: h[9].y };
-            statusText.innerText = isFist ? "狀態：聚集粒子" : "狀態：張開手掌";
+            statusText.innerText = isFist ? "狀態：聚集粒子模式" : "狀態：手部感應中 - 請試試握拳";
         } else {
             isFist = false;
+            statusText.innerText = "狀態：未偵測到手部";
         }
     });
 
     const camera = new Camera(videoElement, {
         onFrame: async () => { await hands.send({image: videoElement}); },
-        width: 640, height: 480 // 降低解析度提升手機運算速度
+        width: 640, height: 480
     });
     camera.start();
 </script>
