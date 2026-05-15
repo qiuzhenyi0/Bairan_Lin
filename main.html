@@ -1,75 +1,397 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Project Zero</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-        
-        /* Header 縮小字體 */
-        .header { height: 45px; background: #00F9C7; display: flex; align-items: center; padding: 0 12px; position: relative; z-index: 1000; }
-        .header .title { font-weight: bold; color: #000; font-size: 14px; flex-grow: 1; }
-        .welcome-text { font-size: 10px; opacity: 0.6; letter-spacing: 1px; }
-
-        .layout { display: flex; height: calc(100vh - 45px); width: 100%; }
-
-        /* 側邊欄：字體與寬度極小化 */
-        .sidebar { width: 70px; flex-shrink: 0; background-color: #a3d9c9; display: flex; flex-direction: column; align-items: center; padding: 8px 0; z-index: 99; }
-        .sidebar a { width: 100%; padding: 10px 0; color: #333; text-decoration: none; font-weight: bold; font-size: 11px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.03); }
-
-        .content-area { flex-grow: 1; position: relative; background: #000; }
-        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .sidebar-bottom-group { margin-top: auto; display: flex; flex-direction: column; align-items: center; width: 100%; padding-bottom: 12px; }
-        #music-ui { width: 60px; cursor: pointer; margin-bottom: 4px; }
-        #music-ui img { width: 100%; display: block; }
-        .dog-container { width: 30px; }
-        .dog-container img { width: 100%; display: block; }
-
-        @media (min-width: 768px) {
-            .header { height: 60px; }
-            .header .title { font-size: 20px; }
-            .sidebar { width: 180px; }
-            .sidebar a { font-size: 15px; padding: 15px 0; }
-            .layout { height: calc(100vh - 60px); }
-            #music-ui { width: 110px; }
-            .dog-container { width: 55px; }
+        /* ===== 全局基礎設定 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    </style>
+
+```
+    body, html {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    /* ===== Header 響應式優化 (任務 1) ===== */
+    
+    /* 基礎樣式（320px 超小手機） */
+    .header {
+        width: 100%;
+        background: #00F9C7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        box-sizing: border-box;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        flex-wrap: wrap;
+        gap: 8px;
+        z-index: 1000;
+    }
+
+    .header .title {
+        font-size: clamp(16px, 4vw, 42px);
+        font-weight: 700;
+        color: #0D0D0D;
+        flex: 1;
+        min-width: 150px;
+        word-break: break-word;
+    }
+
+    .header .welcome-text {
+        font-size: 12px;
+        opacity: 0.7;
+        letter-spacing: 2px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* 480px（中小手機） */
+    @media (min-width: 480px) {
+        .header {
+            padding: 14px 20px;
+            gap: 12px;
+        }
+
+        .header .title {
+            font-size: clamp(18px, 4.5vw, 42px);
+        }
+
+        .header .welcome-text {
+            font-size: 13px;
+            opacity: 0.75;
+            letter-spacing: 3px;
+        }
+    }
+
+    /* 768px（平板豎屏 / 大手機） */
+    @media (min-width: 768px) {
+        .header {
+            padding: 18px 30px;
+            gap: 15px;
+        }
+
+        .header .title {
+            font-size: clamp(20px, 5vw, 42px);
+        }
+
+        .header .welcome-text {
+            font-size: 16px;
+            opacity: 0.8;
+            letter-spacing: 4px;
+        }
+    }
+
+    /* 1024px（平板橫屏） */
+    @media (min-width: 1024px) {
+        .header {
+            padding: 20px 40px;
+        }
+
+        .header .title {
+            font-size: clamp(24px, 5vw, 42px);
+        }
+
+        .header .welcome-text {
+            font-size: 18px;
+            opacity: 0.8;
+            letter-spacing: 4px;
+        }
+    }
+
+    /* 橫屏模式調整（手機橫屏時） */
+    @media (max-height: 500px) and (orientation: landscape) {
+        .header {
+            padding: 10px 20px;
+        }
+
+        .header .title {
+            font-size: clamp(14px, 3vw, 28px);
+        }
+
+        .header .welcome-text {
+            font-size: 11px;
+        }
+    }
+
+    /* ===== Layout 佈局 ===== */
+    .layout {
+        display: flex;
+        height: calc(100vh - 45px);
+        width: 100%;
+    }
+
+    /* 手機版 height 調整 */
+    @media (min-width: 768px) {
+        .layout {
+            height: calc(100vh - 60px);
+        }
+    }
+
+    /* ===== 側邊欄 (Sidebar) - 任務 2 預留空間 ===== */
+    .sidebar {
+        width: 70px;
+        flex-shrink: 0;
+        background-color: #a3d9c9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 0;
+        z-index: 99;
+        overflow-y: auto;
+    }
+
+    .sidebar a {
+        width: 100%;
+        padding: 10px 8px;
+        color: #333;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 11px;
+        text-align: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        transition: 0.3s ease;
+        word-break: break-word;
+    }
+
+    .sidebar a:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(3px);
+    }
+
+    @media (min-width: 768px) {
+        .sidebar {
+            width: 180px;
+            padding: 12px 0;
+        }
+
+        .sidebar a {
+            font-size: 15px;
+            padding: 12px 10px;
+        }
+    }
+
+    /* ===== 內容區 ===== */
+    .content-area {
+        flex-grow: 1;
+        position: relative;
+        background: #000;
+        overflow: hidden;
+    }
+
+    .content-area iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* ===== 側邊欄底部控制 ===== */
+    .sidebar-bottom-group {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding-bottom: 12px;
+        gap: 8px;
+    }
+
+    #music-ui {
+        width: 50px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    #music-ui img {
+        width: 100%;
+        display: block;
+        user-select: none;
+    }
+
+    #music-ui:hover {
+        transform: scale(1.05);
+    }
+
+    .dog-container {
+        width: 28px;
+        margin-top: 4px;
+    }
+
+    .dog-container img {
+        width: 100%;
+        display: block;
+    }
+
+    @media (min-width: 768px) {
+        #music-ui {
+            width: 100px;
+        }
+
+        .dog-container {
+            width: 50px;
+        }
+    }
+
+    /* ===== 無障礙調整 ===== */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* 深色模式支持 */
+    @media (prefers-color-scheme: dark) {
+        .header {
+            background: #00D4B0;
+            border-bottom-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .header .title {
+            color: #FFFFFF;
+        }
+    }
+
+    /* 觸碰友善度（移動設備） */
+    @media (hover: none) and (pointer: coarse) {
+        .sidebar a {
+            padding: 14px 10px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #music-ui {
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+</style>
+```
+
 </head>
 <body>
-    <audio id="bgm" loop preload="auto"><source src="Music/Music.mp3" type="audio/mpeg"></audio>
-    <div class="header">
-        <div class="title">Project Zero / 零計畫</div>
-        <div class="welcome-text">Welcome</div>
-    </div>
-    <div class="layout">
-        <div class="sidebar">
-            <a href="home.html" target="content-frame">自介</a>
-            <a href="diary.html" target="content-frame">日記</a>
-            <a href="blog.html" target="content-frame">部落格</a>
-            <a href="gallery.html" target="content-frame">相簿</a>
-            <a href="collections.html" target="content-frame">收藏</a>
-            <a href="fortune.html" target="content-frame">幸運指數</a>
-            <a href="festival.html" target="content-frame">節慶</a>
-            <div class="sidebar-bottom-group">
-                <div id="music-ui" onclick="togglePlay()"><img id="btn-img" src="Music/IMG_3115.png"></div>
-                <div class="dog-container"><img src="GIF_20251224164146204.gif"></div>
+    <!-- 背景音樂 -->
+    <audio id="bgm" loop preload="auto">
+        <source src="Music/Music.mp3" type="audio/mpeg">
+    </audio>
+
+```
+<!-- Header (任務 1 優化) -->
+<div class="header">
+    <div class="title">Project Zero / 零計畫</div>
+    <div class="welcome-text">Welcome</div>
+</div>
+
+<!-- 主佈局 -->
+<div class="layout">
+    <!-- 側邊欄 -->
+    <div class="sidebar">
+        <a href="home.html" target="content-frame">自介</a>
+        <a href="diary.html" target="content-frame">日記</a>
+        <a href="blog.html" target="content-frame">部落格</a>
+        <a href="gallery.html" target="content-frame">相簿</a>
+        <a href="collections.html" target="content-frame">收藏</a>
+        <a href="fortune.html" target="content-frame">幸運指數</a>
+        <a href="festival.html" target="content-frame">節慶</a>
+
+        <!-- 側邊欄底部：音樂控制 + 小狗 -->
+        <div class="sidebar-bottom-group">
+            <div id="music-ui" onclick="togglePlay()" role="button" tabindex="0" aria-label="播放/暫停音樂">
+                <img id="btn-img" src="Music/IMG_3115.png" alt="音樂控制按鈕">
+            </div>
+            <div class="dog-container">
+                <img src="GIF_20251224164146204.gif" alt="裝飾小狗">
             </div>
         </div>
-        <div class="content-area"><iframe src="home.html" name="content-frame"></iframe></div>
     </div>
-    <script>
-        const audio = document.getElementById('bgm');
-        const img = document.getElementById('btn-img');
-        function updateIcon() { img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png"; }
-        function togglePlay() { if (audio.paused) { audio.play().then(updateIcon); } else { audio.pause(); updateIcon(); } }
-        window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('autoplay') === 'true') { audio.play().then(updateIcon).catch(updateIcon); }
-        };
-        document.querySelector('.sidebar').addEventListener('click', () => { if (audio.paused && audio.currentTime === 0) { audio.play().then(updateIcon); } }, { once: true });
-    </script>
+
+    <!-- 內容區 -->
+    <div class="content-area">
+        <iframe src="home.html" name="content-frame" title="頁面內容"></iframe>
+    </div>
+</div>
+
+<script>
+    const audio = document.getElementById('bgm');
+    const img = document.getElementById('btn-img');
+    const musicUI = document.getElementById('music-ui');
+
+    // 更新音樂圖示
+    function updateIcon() {
+        img.src = audio.paused ? "Music/IMG_3115.png" : "Music/IMG_3116.png";
+    }
+
+    // 切換播放/暫停
+    function togglePlay() {
+        if (audio.paused) {
+            audio.play()
+                .then(() => {
+                    updateIcon();
+                })
+                .catch(() => {
+                    updateIcon();
+                });
+        } else {
+            audio.pause();
+            updateIcon();
+        }
+    }
+
+    // 支持鍵盤控制
+    musicUI.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            togglePlay();
+        }
+    });
+
+    // 頁面載入時檢查自動播放
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('autoplay') === 'true') {
+            audio.play()
+                .then(() => {
+                    updateIcon();
+                })
+                .catch(() => {
+                    updateIcon();
+                });
+        }
+    });
+
+    // 使用者首次互動後自動播放
+    document.addEventListener('click', () => {
+        if (audio.paused && audio.currentTime === 0) {
+            audio.play()
+                .then(() => {
+                    updateIcon();
+                })
+                .catch(() => {
+                    updateIcon();
+                });
+        }
+    }, { once: true });
+</script>
+```
+
 </body>
 </html>
