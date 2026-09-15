@@ -1,57 +1,184 @@
 <!DOCTYPE html>
+
 <html lang="zh-Hant-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project Zero / 零計畫</title>
-<style>
-:root{--mint:#00F9C7;--soft:#a3d9c9;--muted:#bbb;--panel:rgba(255,255,255,.035)}
-*{box-sizing:border-box} body{background:#000;color:#fff;font-family:sans-serif;margin:0;padding:12px}
-h2{color:var(--mint);font-size:16px;margin:0 0 12px;letter-spacing:1px}.button-group{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px}
-.btn{padding:5px 8px;border:1px solid rgba(0,249,199,.5);color:var(--mint);text-decoration:none;font-size:10px;border-radius:3px;min-width:60px;text-align:center;background:rgba(0,249,199,.05)}
-.card{border:1px solid rgba(0,249,199,.2);border-radius:6px;padding:12px;margin-bottom:12px;background:var(--panel)}.card-title{font-weight:bold;color:var(--soft);margin-bottom:6px;font-size:12px}.card-text{font-size:11px;line-height:1.5;color:var(--muted)}
-.expandable-btn{background:rgba(0,249,199,.05);border:1px solid rgba(0,249,199,.5);color:var(--mint);padding:8px 12px;margin-bottom:8px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:bold;width:100%;text-align:left;transition:.3s}.expandable-btn:hover{background:rgba(0,249,199,.15);transform:translateX(4px)}
-.expandable-content{display:none;background:rgba(0,249,199,.05);border-left:3px solid var(--mint);padding:12px;margin-bottom:12px;border-radius:0 6px 6px 0;font-size:11px;line-height:1.6;color:var(--muted);white-space:pre-wrap;word-wrap:break-word}.expandable-content.active{display:block}.expandable-content a{color:var(--mint);text-decoration:none;font-weight:bold;word-break:break-all}
-/* Minecraft module */
-.minecraft-card{overflow:hidden}.minecraft-card .card-title{display:flex;align-items:center;gap:7px}.mc-badge{font-size:9px;padding:2px 5px;border:1px solid var(--mint);border-radius:3px;color:var(--mint);font-weight:normal}
-.mc-stage{position:relative;height:275px;margin:10px 0;border:1px solid rgba(0,249,199,.23);border-radius:5px;overflow:hidden;background:radial-gradient(circle at 50% 38%,rgba(0,249,199,.12),transparent 35%),linear-gradient(145deg,#061512,#020605 62%,#001913)}
-.mc-stage:after{content:"";position:absolute;left:11%;right:11%;bottom:27px;height:1px;background:rgba(0,249,199,.3);box-shadow:0 0 20px 5px rgba(0,249,199,.08)}
-.mc-hint{position:absolute;z-index:3;top:9px;left:10px;font-size:9px;color:rgba(200,255,242,.65);letter-spacing:.4px}.mc-model{position:absolute;z-index:2;left:50%;top:50%;width:70px;height:170px;transform:translate(-50%,-45%) rotateY(-25deg) rotateZ(0deg);transform-style:preserve-3d;transition:transform .08s linear;filter:drop-shadow(0 18px 8px rgba(0,0,0,.7))}
-.cube{position:absolute;transform-style:preserve-3d}.head{width:58px;height:58px;left:6px;top:0;background:#be815e;border:2px solid #21130f;box-shadow:inset 12px 0 rgba(90,47,33,.22)}.head:before{content:"";position:absolute;left:0;top:0;width:100%;height:17px;background:#281b19;box-shadow:inset -12px 0 rgba(0,0,0,.25)}.head:after{content:"";position:absolute;left:11px;top:27px;width:7px;height:7px;background:#222;box-shadow:29px 0 #222,10px 15px #8d4f46,27px 15px #8d4f46}
-.torso{width:64px;height:58px;left:3px;top:62px;background:#2b4356;border:2px solid #111c23;box-shadow:inset 13px 0 rgba(121,221,197,.17)}.arm{width:21px;height:58px;top:63px;background:#be815e;border:2px solid #21130f}.arm.left{left:-19px;transform:rotate(3deg)}.arm.right{right:-19px;transform:rotate(-3deg)}.leg{width:27px;height:56px;top:120px;background:#273549;border:2px solid #111923}.leg.left{left:4px}.leg.right{right:4px}.cube:before,.cube:after{content:"";position:absolute;border:2px solid rgba(0,0,0,.28);background:inherit}.head:before{z-index:1}
-.mc-controls{display:flex;gap:7px;align-items:center;margin-top:7px}.mc-file{flex:1;min-width:0;color:#9ed9ca;font-size:10px}.mc-file::file-selector-button,.mc-btn{border:1px solid rgba(0,249,199,.55);border-radius:3px;background:rgba(0,249,199,.08);color:var(--mint);padding:6px 8px;font-size:10px;cursor:pointer}.mc-btn{white-space:nowrap}.mc-note{margin-top:7px;font-size:10px;color:#788f88;line-height:1.45}.mc-status{color:var(--mint);font-size:10px;margin-top:5px;min-height:14px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background-color: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 12px; }
+
+h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
+
+.button-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+.btn { 
+    padding: 5px 8px; border: 1px solid rgba(0, 249, 199, 0.5); 
+    color: #00F9C7; text-decoration: none; font-size: 10px; 
+    border-radius: 3px; min-width: 60px; text-align: center;
+    background: rgba(0, 249, 199, 0.05);
+}
+
+.card { 
+    border: 1px solid rgba(0, 249, 199, 0.2); border-radius: 6px; 
+    padding: 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.03); 
+}
+.card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
+.card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
+
+.image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+.image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+
+.image-grid::-webkit-scrollbar { display: none; }
+
+.expandable-btn {
+    background: rgba(0, 249, 199, 0.05);
+    border: 1px solid rgba(0, 249, 199, 0.5);
+    color: #00F9C7;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    width: 100%;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.expandable-btn:hover {
+    background: rgba(0, 249, 199, 0.15);
+    transform: translateX(4px);
+}
+
+.expandable-content {
+    display: none;
+    background: rgba(0, 249, 199, 0.05);
+    border-left: 3px solid #00F9C7;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #bbb;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.expandable-content.active {
+    display: block;
+}
+
+.expandable-content a {
+    color: #00F9C7;
+    text-decoration: none;
+    font-weight: bold;
+    word-break: break-all;
+}
+
+.expandable-content a:hover {
+    text-decoration: underline;
+}
+    </style>
+
 </head>
 <body>
-<h2>歡迎回來</h2>
-<div class="button-group"><a href="https://www.instagram.com/qiuzhenyi0" class="btn" target="_blank">Instagram</a><a href="https://www.facebook.com/share/1F43c66QWw/" class="btn" target="_blank">Facebook</a><a href="https://x.com/bairan_lin" class="btn" target="_blank">X (Twitter)</a></div>
-<div class="card"><div class="card-title">自介</div><div class="card-text">⌗ 玲㿟染 / Bairan Lin<br>⌗ 台灣 | INTJ-T<br>⌗ 忌色,毒話題、沒有邊界感<br>⌗ Flourish / Zippo tricks 玩家<br>⌗ Python / HTML / C++ / JS<br>⌗ 無性戀<br>⌗ 夢想大學：成大資工、政大資工</div></div>
-<div class="card"><div class="card-title">光遇 Sky</div><div class="card-text">常駐林克長髮 | 無 cp 固玩監護 無雷<br>淡遊小氪,雙號<br>「自由只是你還未學習正確依附我時，暫時必要的累贅。」</div></div>
-<div class="card"><div class="card-title">超自然</div><div class="card-text">Baïran Lin 10319179<br>主摸金<br>主推愛德華 副蘭推倫推<br>@白銀狐 固排 @玲染 小號</div></div>
-
-<!-- Minecraft：放在「超自然」下方的同款模塊 -->
-<div class="card minecraft-card">
-  <div class="card-title"><span>Minecraft</span><span class="mc-badge">3D SKIN PREVIEW</span></div>
-  <div class="card-text">拖曳小人即可旋轉，支援觸控；之後可直接匯入 Minecraft PNG skin。</div>
-  <div class="mc-stage" id="mcStage" aria-label="Minecraft 3D 角色預覽">
-    <div class="mc-hint">DRAG TO ROTATE · Z-AXIS PREVIEW</div>
-    <div class="mc-model" id="mcModel">
-      <div class="cube head"></div><div class="cube torso"></div><div class="cube arm left"></div><div class="cube arm right"></div><div class="cube leg left"></div><div class="cube leg right"></div>
+    <h2>歡迎回來</h2>
+    <div class="button-group">
+        <a href="https://www.instagram.com/qiuzhenyi0?igsh=MXYwdTJuMTh5cDN6MA%3D%3D&utm_source=qr" class="btn" target="_blank">
+            <i class="fab fa-instagram"></i> Instagram
+        </a>
+        <a href="https://www.facebook.com/share/1F43c66QWw/?mibextid=wwXIfr" class="btn" target="_blank">
+            <i class="fab fa-facebook"></i> Facebook
+        </a>
+        <a href="https://x.com/bairan_lin?s=21" class="btn" target="_blank">
+            <i class="fab fa-twitter"></i> X (Twitter)
+        </a>
     </div>
-  </div>
-  <div class="mc-controls"><input class="mc-file" id="skinInput" type="file" accept="image/png" aria-label="匯入 Minecraft skin PNG"><button class="mc-btn" id="resetBtn" type="button">重設視角</button></div>
-  <div class="mc-status" id="mcStatus"></div><div class="mc-note">目前為可互動展示版；PNG 匯入介面已預留，正式版可再接 Minecraft 64×64 / 128×128 skin UV 貼圖。</div>
+
+<div class="card">
+    <div class="card-title">自介</div>
+    <div class="card-text">
+        ⌗ 玲㿟染 / Bairan Lin<br>
+        ⌗ 台灣 | INTJ-T<br>
+        ⌗ 忌色,毒話題、沒有邊界感<br>
+        ⌗ Flourish / Zippo tricks 玩家<br>
+        ⌗ Python / HTML / C++ / JS<br>
+        ⌗ 無性戀<br>
+        ⌗ 夢想大學：成大資工、政大資工
+    </div>
 </div>
 
-<button class="expandable-btn" onclick="toggleContent(this)">▸ AZR Systems</button><div class="expandable-content"><div style="margin-bottom:8px"><strong>團長</strong></div><div style="margin-bottom:10px">AZR Systems | 你的創意實現廠牌<br><br>設計 × 開發 × 代製 × 多多遊戲陪陪<br>無論是美編卡面、客製網頁,小遊戲和機器人還是文件代做<br>我們用心打造,精確訂製<br>為您提供熱門遊戲陪玩<br>有想法？找 AZR<br>準備好改變了嗎？</div><a href="https://discord.gg/zf95kurcet" target="_blank">交給我們</a></div>
-<button class="expandable-btn" onclick="toggleContent(this)">▸ ⋆.𐙚 ̊.小祈雜貨商ᯓᡣ𐭩</button><div class="expandable-content"><div style="margin-bottom:8px"><strong>準團長</strong></div><div style="margin-bottom:10px">一家开在旧时光里的小店...☂<br><br>在雨声里营业 贩售一点温柔和一点晴天<br><br>⋆.𐙚 ̊.小祈杂货商ᯓᡣ𐭩<br><br>┄ ┄ ┄ ┄ ┄ ┄<br><br>..招收中..<br>代带 / 先祖 / 试炼 / 小金人<br>獻祭 / 开图 / 代挂 / 卖心</div><a href="https://discord.gg/CCannzKcbh" target="_blank">推門而入？</a></div>
+<div class="card">
+    <div class="card-title">光遇 Sky</div>
+    <div class="card-text">
+        常駐林克長髮 | 無 cp 固玩監護 無雷<br>
+        淡遊小氪,雙號<br>
+        「自由只是你還未學習正確依附我時，暫時必要的累贅。」
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">超自然</div>
+    <div class="card-text">
+        Baïran Lin 10319179<br>
+        主摸金<br>
+        主推愛德華 副蘭推倫推<br>
+        @白銀狐 固排 @玲染 小號
+    </div>
+</div>
+
+<button class="expandable-btn" onclick="toggleContent(this)">▸ AZR Systems</button>
+
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>團長</strong></div>
+    <div style="margin-bottom: 10px;">AZR Systems | 你的創意實現廠牌
+
+設計 × 開發 × 代製 × 多多遊戲陪陪
+無論是美編卡面、客製網頁,小遊戲和機器人還是文件代做
+我們用心打造,精確訂製
+為您提供熱門遊戲陪玩
+有想法？找 AZR
+準備好改變了嗎？</div>
+
+<div>                                                    <a href="https://discord.gg/zf95kurcet" target="_blank">交給我們</a></div>
+</div>
+
+<button class="expandable-btn" onclick="toggleContent(this)">▸ ⋆.𐙚 ̊.小祈雜貨商ᯓᡣ𐭩</button>
+
+<div class="expandable-content">
+    <div style="margin-bottom: 8px;"><strong>準團長</strong></div>
+    <div style="margin-bottom: 10px;">一家开在旧时光里的小店...☂
+
+在雨声里营业 贩售一点温柔和一点晴天
+一场小雨 一盏昏灯 一家…
+
+⋆.𐙚 ̊.小祈杂货商ᯓᡣ𐭩
+
+┄ ┄ ┄ ┄ ┄ ┄
+
+..招收中..
+代带 / 先祖 / 试炼 / 小金人
+獻祭 / 开图 / 代挂 / 卖心
+
+..卖心优惠..
+1 0 0 ♡ 送 1 5 ♡
+2 0 0 ♡ 送 2 5 ♡
+3 0 0 ♡ 送 3 5 ♡
+..依此类推..
+
+┄ ┄ ┄ ┄ ┄ ┄</div>
+
+<div>                                                    <a href="https://discord.gg/CCannzKcbh" target="_blank">推門而入？</a></div>
+</div>
+
 <script>
-function toggleContent(button){const content=button.nextElementSibling;content.classList.toggle('active');button.textContent=button.textContent.includes('▸')?button.textContent.replace('▸','▾'):button.textContent.replace('▾','▸')}
-const stage=document.getElementById('mcStage'),model=document.getElementById('mcModel'),input=document.getElementById('skinInput'),status=document.getElementById('mcStatus'),reset=document.getElementById('resetBtn');let dragging=false,lastX=0,rotation=-25;
-function move(x){if(!dragging)return;rotation+=(x-lastX)*.8;lastX=x;model.style.transform=`translate(-50%,-45%) rotateY(${rotation}deg) rotateZ(0deg)`}
-stage.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;stage.setPointerCapture(e.pointerId)});stage.addEventListener('pointermove',e=>move(e.clientX));stage.addEventListener('pointerup',()=>dragging=false);stage.addEventListener('pointercancel',()=>dragging=false);
-reset.addEventListener('click',()=>{rotation=-25;model.style.transform='translate(-50%,-45%) rotateY(-25deg) rotateZ(0deg)';status.textContent='視角已重設'});
-input.addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;if(!file.type.includes('png')){status.textContent='請選擇 PNG skin 檔案';return}const url=URL.createObjectURL(file);document.querySelectorAll('.cube').forEach(el=>{el.style.backgroundImage=`url(${url})`;el.style.backgroundSize='cover';});status.textContent=`已載入：${file.name}（預覽貼圖）`});
+    function toggleContent(button) {
+        const content = button.nextElementSibling;
+        content.classList.toggle('active');
+        button.textContent = button.textContent.includes('▸') ? 
+            button.textContent.replace('▸', '▾') : 
+            button.textContent.replace('▾', '▸');
+    }
 </script>
+
 </body>
 </html>
