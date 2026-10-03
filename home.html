@@ -24,6 +24,8 @@ h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
 .card-title { font-weight: bold; color: #a3d9c9; margin-bottom: 6px; font-size: 12px; }
 .card-text { font-size: 11px; line-height: 1.5; color: #bbb; }
 
+.card-flex { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
 .image-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
 .image-grid img { width: 80px; height: 80px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
 
@@ -77,6 +79,11 @@ h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
 .expandable-content a:hover {
     text-decoration: underline;
 }
+
+#mc-canvas {
+    flex-shrink: 0;
+    touch-action: none;
+}
     </style>
 
 </head>
@@ -124,6 +131,18 @@ h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
         主推愛德華 副蘭推倫推<br>
         @白銀狐 固排 @玲染 小號
     </div>
+</div>
+
+<div class="card card-flex">
+    <div>
+        <div class="card-title">Minecraft</div>
+        <div class="card-text">
+            玩法:生存 / 建築<br>
+            ID:待補充
+        </div>
+    </div>
+    <!-- 3D 小人,讀取 Minecraft/skin.png 材質貼圖,拖曳可旋轉;之後要換 skin 只要換掉這個檔案,程式碼不用改 -->
+    <canvas id="mc-canvas" width="100" height="150"></canvas>
 </div>
 
 <button class="expandable-btn" onclick="toggleContent(this)">▸ AZR Systems</button>
@@ -178,6 +197,22 @@ h2 { color: #00F9C7; font-size: 16px; margin: 0 0 12px 0; letter-spacing: 1px; }
             button.textContent.replace('▸', '▾') : 
             button.textContent.replace('▾', '▸');
     }
+</script>
+
+<script type="module">
+    import * as skinview3d from "https://cdn.jsdelivr.net/npm/skinview3d@3.4.2/+esm";
+
+    const mcViewer = new skinview3d.SkinViewer({
+        canvas: document.getElementById("mc-canvas"),
+        width: 100,
+        height: 150,
+        skin: "Minecraft/skin.png"
+    });
+    mcViewer.zoom = 0.9;
+
+    mcViewer.controls.enableRotate = true;
+    mcViewer.controls.enableZoom = false;
+    mcViewer.controls.enablePan = false;
 </script>
 
 </body>
