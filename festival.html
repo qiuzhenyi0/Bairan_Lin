@@ -1,140 +1,295 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <style>
-        body, html { margin: 0; padding: 0; background: #000; overflow: hidden; height: 100vh; width: 100%; }
-        #output_canvas { width: 100%; height: 100%; object-fit: contain; }
-        /* 頂標文字維持綠色 */
-        .festival-ui { position: absolute; top: 20px; left: 20px; color: #00F9C7; z-index: 10; font-family: sans-serif; pointer-events: none; text-shadow: 0 0 10px rgba(0,0,0,0.8); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Merry Christmas × Happy New Year</title>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #050818; overflow: hidden; }
+  /* 修正：canvas 固定鋪滿可視區、display:block，避免 inline 基線空隙與手機 100vh 問題 */
+  #c { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; }
+  .ui { position: fixed; top: 16px; left: 16px; z-index: 10; font-family: sans-serif; pointer-events: none;
+        text-shadow: 0 0 10px rgba(0,0,0,.8); color: #2ecc71; transition: color .6s; }
+  .ui h2 { margin: 0 0 6px; font-size: clamp(16px, 4vw, 24px); }
+  .ui p { margin: 0; font-size: clamp(12px, 3vw, 15px); color: #cfd8ff; }
+</style>
 </head>
 <body>
-    <div class="festival-ui">
-        <h2>🎂 Birthday Celebration 🎂</h2>
-        <p>✊ 握拳：聚集驚喜 / 🖐️ 張手：散開粒子</p>
-    </div>
-    <video id="input_video" style="display:none;" playsinline></video>
-    <canvas id="output_canvas"></canvas>
+<div class="ui"><h2 id="title"></h2><p>✊ 握拳:聚集 / 🖐️ 張手:散開 / ✌️ 比 2 按住 1 秒:切換場景</p></div>
+<video id="input_video" style="display:none" playsinline></video>
+<canvas id="c"></canvas>
 
 <script>
-    const videoElement = document.getElementById('input_video');
-    const canvasElement = document.getElementById('output_canvas');
-    const canvasCtx = canvasElement.getContext('2d');
-    
-    let particles = [], textPoints = [], isFist = false, currentHand = { x: 0.5, y: 0.5 };
-    const PARTICLE_COUNT = 1800; 
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const COUNT = 2600;
+const XM = ['#ff4d4d', '#2ecc71', '#ffd54a', '#ffffff'];
+const NY = ['#ffd76a', '#f2f5ff', '#8ea2ff', '#c084fc', '#ff9ec4'];
 
-    function initText() {
-        const tCanvas = document.createElement('canvas');
-        const tCtx = tCanvas.getContext('2d');
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        tCanvas.width = w; tCanvas.height = h;
-        
-        tCtx.fillStyle = "white"; 
-        tCtx.textAlign = "center";
-        
-        const fontSize = Math.min(w / 10, 55);
-        tCtx.font = `bold ${fontSize}px Arial`;
-        tCtx.fillText("HAPPY BIRTHDAY", w/2, h*0.3);
-        tCtx.fillText("TO ME", w/2, h*0.4);
-        
-        const cx = w/2;
-        const cy = h*0.6; 
-        
-        tCtx.fillRect(cx - 70, cy + 30, 140, 35); // 底層
-        tCtx.fillRect(cx - 50, cy - 5, 100, 30);  // 中層
-        tCtx.fillRect(cx - 30, cy - 35, 60, 25);  // 頂層
-        
-        tCtx.fillRect(cx - 25, cy - 52, 4, 18); // 蠟燭 L
-        tCtx.fillRect(cx - 2, cy - 58, 4, 24);  // 蠟燭 M
-        tCtx.fillRect(cx + 21, cy - 52, 4, 18); // 蠟燭 R
-        
-        // 獨立繪製火苗，防止黏連
-        [[cx - 23, cy - 58, 3], [cx, cy - 65, 4], [cx + 23, cy - 58, 3]].forEach(p => {
-            tCtx.beginPath();
-            tCtx.arc(p[0], p[1], p[2], 0, Math.PI*2);
-            tCtx.fill();
-        });
+let W = 0, H = 0, frame = 0, lock = 0, flash = 0;
+let scene, target = 0, yearText;
+let twoStart = 0, gProg = 0, coolUntil = 0;
+let camFist = false, kbFist = false, isFist = false, handSeen = false;
+let tgt = { x: .5, y: .5 }, hand = { x: 0, y: 0 }, anchor = { x: 0, y: 0 };
+let layout = { pts: [], hw: 0, hh: 0 };
+let particles = [], flakes = [];
+const bursts = Array.from({ length: 12 }, () => ({ id: 0, x: 0, y: 0, t0: 0, dur: 1, col: NY[0] }));
 
-        const data = tCtx.getImageData(0, 0, w, h).data;
-        textPoints = [];
-        for (let y = 0; y < h; y += 2) {
-            for (let x = 0; x < w; x += 2) {
-                if (data[(y * w + x) * 4 + 3] > 128) textPoints.push({ x: x - w/2, y: y - h/2 });
-            }
-        }
-    }
+/* ---------- 場景與倒數設定 ---------- */
+function setup() {
+  const n = new Date(), y = n.getFullYear();
+  if (n.getMonth() === 0) { scene = 'newyear'; yearText = String(y); target = 0; }
+  else { scene = 'christmas'; yearText = String(y + 1); target = new Date(y + 1, 0, 1).getTime(); }
+  if (location.search.includes('test')) { scene = 'christmas'; target = Date.now() + 20000; }
+}
 
-    class Particle {
-        constructor(id) {
-            this.id = id;
-            this.x = Math.random() * window.innerWidth;
-            this.y = Math.random() * window.innerHeight;
-            this.v = { x: (Math.random()-0.5)*5, y: (Math.random()-0.5)*5 };
-            // 改回粉嫩/閃爍色調 (Hue 330-360 是粉色到桃色)
-            this.hue = Math.random() * 40 + 330; 
-            this.bri = 50;
-        }
-        update() {
-            if (isFist && textPoints.length > 0) {
-                let pt = textPoints[this.id % textPoints.length];
-                let tx = currentHand.x * canvasElement.width + pt.x;
-                let ty = currentHand.y * canvasElement.height + pt.y;
-                this.x += (tx - this.x) * 0.15;
-                this.y += (ty - this.y) * 0.15;
-                this.bri = 60 + Math.random() * 40;
-            } else {
-                this.x += this.v.x;
-                this.y += this.v.y;
-                if(this.x < 0 || this.x > canvasElement.width) this.v.x *= -1;
-                if(this.y < 0 || this.y > canvasElement.height) this.v.y *= -1;
-                let dx = this.x - (currentHand.x * canvasElement.width);
-                let dy = this.y - (currentHand.y * canvasElement.height);
-                if (Math.hypot(dx, dy) > 250) { this.v.x -= dx * 0.001; this.v.y -= dy * 0.001; }
-                this.bri = 50;
-            }
-        }
-        draw() {
-            canvasCtx.fillStyle = `hsl(${this.hue}, 100%, ${this.bri}%)`;
-            canvasCtx.beginPath();
-            canvasCtx.arc(this.x, this.y, isFist ? 2 : 1.5, 0, Math.PI*2);
-            canvasCtx.fill();
-        }
-    }
-
-    window.addEventListener('resize', initText);
-    initText();
-    for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle(i));
-
-    function animate() {
-        canvasElement.width = canvasElement.clientWidth;
-        canvasElement.height = canvasElement.clientHeight;
-        
-        // 關鍵：調低 alpha (0.12) 來製造 image_5 那種長拖尾感
-        canvasCtx.fillStyle = "rgba(0,0,0,0.12)";
-        canvasCtx.fillRect(0, 0, canvasElement.width, canvasElement.height);
-        
-        particles.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-    hands.onResults(res => {
-        if (res.multiHandLandmarks && res.multiHandLandmarks.length > 0) {
-            const h = res.multiHandLandmarks[0];
-            const dist = Math.hypot(h[8].x - h[4].x, h[8].y - h[4].y);
-            isFist = dist < 0.1; 
-            currentHand = { x: 1 - h[9].x, y: h[9].y };
-        } else { isFist = false; }
+/* ---------- 文字 / 圖形點陣 ---------- */
+function fit(c, text, maxW, maxPx) {
+  c.font = 'bold 100px Arial';
+  return Math.min(maxPx, 100 * maxW / c.measureText(text).width);
+}
+function star(c, cx, cy, R, r) {
+  c.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r : R;
+    c.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
+  c.closePath(); c.fill();
+}
+function drawXmas(ct, c) {
+  const txt = 'MERRY CHRISTMAS', fs = fit(c, txt, W * .88, Math.min(H * .09, 64));
+  const th = Math.min(H * .55, W * .75), gap = fs * .9, y0 = (H - (fs + gap + th)) / 2, cx = W / 2;
+  ct.font = `bold ${fs}px Arial`; ct.fillStyle = '#ffe9a8'; ct.fillText(txt, cx, y0 + fs / 2);
+  const top = y0 + fs + gap, R = th * .07;
+  c.fillStyle = '#ffd54a'; star(c, cx, top + R, R, R * .45);
+  const trunk = th * .1, fTop = top + R * 1.8, fBot = top + th - trunk;
+  const fH = fBot - fTop, tierH = fH * .5, step = (fH - tierH) / 2, half = Math.min(th * .36, W * .4);
+  const shades = ['#1fae5a', '#2ecc71', '#27c46a'];
+  for (let i = 0; i < 3; i++) {
+    const t = fTop + i * step, b = t + tierH, hw = half * (.5 + .25 * i);
+    c.fillStyle = shades[i];
+    c.beginPath(); c.moveTo(cx, t); c.lineTo(cx - hw, b); c.lineTo(cx + hw, b); c.closePath(); c.fill();
+  }
+  for (let i = 0; i < 3; i++) {            // 裝飾球在所有樹層之後畫,不會被蓋住
+    const b = fTop + i * step + tierH, hw = half * (.5 + .25 * i);
+    [-.45, .05, .45].forEach((j, k) => {
+      c.fillStyle = (i + k) % 2 ? '#ffd54a' : '#ff4d4d';
+      c.beginPath(); c.arc(cx + hw * j, b - tierH * .2, th * .022, 0, 6.283); c.fill();
     });
-    const camera = new Camera(videoElement, { onFrame: async () => { await hands.send({image: videoElement}); }, width: 1280, height: 720 });
-    camera.start();
+  }
+  c.fillStyle = '#b06a30'; c.fillRect(cx - th * .04, fBot, th * .08, trunk);
+}
+function drawNY(ct, c) {
+  const t1 = 'HAPPY NEW YEAR', f1 = fit(ct, t1, W * .88, Math.min(H * .09, 60));
+  const f2 = fit(c, yearText, W * .8, H * .28), gap = f1 * .6, y0 = (H - (f1 + gap + f2)) / 2;
+  ct.font = `bold ${f1}px Arial`; ct.fillStyle = '#ffd76a'; ct.fillText(t1, W / 2, y0 + f1 / 2);
+  const yy = y0 + f1 + gap, g = c.createLinearGradient(0, yy, 0, yy + f2);
+  g.addColorStop(0, '#ffffff'); g.addColorStop(.55, '#9fb0ff'); g.addColorStop(1, '#c084fc');
+  c.font = `bold ${f2}px Arial`; c.fillStyle = g; c.fillText(yearText, W / 2, yy + f2 / 2);
+}
+function buildLayout() {
+  const mk = () => { const o = document.createElement('canvas'); o.width = W; o.height = H;
+    const c = o.getContext('2d', { willReadFrequently: true }); c.textAlign = 'center'; c.textBaseline = 'middle'; return c; };
+  const ct = mk(), cs = mk();                      // ct = 文字層, cs = 圖形層(樹)
+  scene === 'christmas' ? drawXmas(ct, cs) : drawNY(ct, cs);
+  const grab = (c, step) => {
+    const d = c.getImageData(0, 0, W, H).data, a = [];
+    for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
+      const k = (y * W + x) * 4; if (d[k + 3] > 128) a.push({ x, y, k });
+    }
+    for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; }
+    return { a, d };
+  };
+  const T = grab(ct, 1), S = grab(cs, 2);
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const g of [T, S]) for (const p of g.a) { if (p.x < x0) x0 = p.x; if (p.x > x1) x1 = p.x; if (p.y < y0) y0 = p.y; if (p.y > y1) y1 = p.y; }
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  // 粒子配額:文字層固定分到 55%(跨年版文字 100%),不再被面積大的樹搶光
+  const nT = S.a.length ? Math.round(COUNT * (scene === 'christmas' ? .55 : .3)) : COUNT;
+  const pick = (g, n) => { const r = []; if (!g.a.length) return r;
+    for (let i = 0; i < n; i++) { const p = g.a[i % g.a.length];
+      r.push({ x: p.x - mx, y: p.y - my, c: `rgb(${g.d[p.k]},${g.d[p.k + 1]},${g.d[p.k + 2]})` }); }
+    return r; };
+  layout = { pts: [...pick(T, nT), ...pick(S, COUNT - nT)], hw: (x1 - x0) / 2, hh: (y1 - y0) / 2 };
+}
+
+/* ---------- 煙火 ---------- */
+function respawn(b) {
+  b.id++; b.dur = 70 + Math.random() * 60; b.t0 = frame;
+  b.x = W * (.15 + Math.random() * .7); b.y = H * (.12 + Math.random() * .5);
+  b.col = NY[(Math.random() * NY.length) | 0];
+}
+function startBursts(center) {
+  bursts.forEach(b => {
+    respawn(b);
+    if (center) { b.x = W / 2; b.y = H * .45; b.dur = 110; }
+    else b.t0 -= Math.random() * b.dur * .8;
+  });
+}
+
+/* ---------- 粒子 ---------- */
+class P {
+  constructor(i) {
+    this.i = i; this.g = i % 12; this.x = Math.random() * W; this.y = Math.random() * H;
+    this.vx = 0; this.vy = 0; this.bx = 0; this.by = 0; this.bid = -1; this.a = 1; this.recolor(); this.c = this.col;
+  }
+  recolor() {
+    const pal = scene === 'christmas' ? XM : NY;
+    this.col = pal[(Math.random() * pal.length) | 0];
+    this.sv = .6 + Math.random() * 1.6; this.ph = Math.random() * 6.283;
+  }
+  update(t) {
+    if (isFist && frame >= lock && layout.pts.length) {
+      const q = layout.pts[this.i % layout.pts.length];
+      this.x += (anchor.x + q.x - this.x) * .15; this.y += (anchor.y + q.y - this.y) * .15;
+      this.c = q.c; this.a = .85 + Math.random() * .15; this.vx = this.vy = 0; return;
+    }
+    this.c = this.col;
+    this.x += this.bx; this.y += this.by; this.bx *= .94; this.by *= .94;
+    if (scene === 'christmas') {            // 雪花飄落
+      this.y += this.sv; this.x += Math.sin(t / 900 + this.ph) * .5;
+      if (this.y > H + 5) { this.y = -5; this.x = Math.random() * W; }
+      if (this.x < -5) this.x = W + 5; else if (this.x > W + 5) this.x = -5;
+      this.a = 1;
+      if (handSeen) {
+        const dx = this.x - hand.x, dy = this.y - hand.y, d = Math.hypot(dx, dy);
+        if (d < 130 && d > 0) { const f = (1 - d / 130) * 3; this.x += dx / d * f; this.y += dy / d * f; }
+      }
+    } else {                                // 煙火爆開
+      const b = bursts[this.g];
+      if (this.bid !== b.id) {
+        this.bid = b.id; this.x = b.x; this.y = b.y; this.col = b.col;
+        const an = Math.random() * 6.283, sp = Math.random() * Math.random() * 7 + .5;
+        this.vx = Math.cos(an) * sp; this.vy = Math.sin(an) * sp;
+      }
+      this.vx *= .97; this.vy = this.vy * .97 + .03; this.x += this.vx; this.y += this.vy;
+      this.a = Math.max(0, Math.min(1, 1 - (frame - b.t0) / b.dur));
+    }
+  }
+}
+
+/* ---------- 場景切換 ---------- */
+function setUI() {
+  const t = document.getElementById('title');
+  t.textContent = scene === 'christmas' ? '🎄 Merry Christmas 🎄' : '🎆 Happy New Year 🎆';
+  t.parentElement.style.color = scene === 'christmas' ? '#2ecc71' : '#ffd76a';
+}
+function switchScene(s) {
+  if (s === 'christmas' && target && target < Date.now()) target = 0;   // 手動切回聖誕時不再被倒數拉回跨年
+  scene = s; lock = frame + 60; flash = 1;     // 1 秒內忽略握拳,讓粒子先散開
+  particles.forEach(p => { p.recolor(); p.bx = (Math.random() - .5) * 24; p.by = (Math.random() - .5) * 24; p.vx = p.vy = 0; });
+  if (s === 'newyear') startBursts(true);
+  buildLayout(); setUI();
+}
+
+/* ---------- 尺寸 ---------- */
+function resize() {
+  W = innerWidth; H = innerHeight;
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#050818'; ctx.fillRect(0, 0, W, H);
+  buildLayout();
+}
+addEventListener('resize', resize);
+
+/* ---------- 主迴圈 ---------- */
+function animate(t) {
+  frame++;
+  // 只在初始化/縮放時改 canvas 尺寸;每幀只疊一層半透明漸層 → 拖尾才會累積
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  const fa = (camFist || kbFist) && frame >= lock ? .4 : .14;   // 聚集時快速淡出,字才清楚
+  g.addColorStop(0, `rgba(5,8,24,${fa})`); g.addColorStop(1, `rgba(14,10,40,${fa})`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  hand.x += (tgt.x * W - hand.x) * .25; hand.y += (tgt.y * H - hand.y) * .25;
+  isFist = camFist || kbFist;
+  const mX = layout.hw + 16, mY = layout.hh + 16;   // 把圖形整個框限制在畫面內,不會被切掉
+  const ax = mX * 2 >= W ? W / 2 : Math.max(mX, Math.min(W - mX, hand.x));
+  const ay = mY * 2 >= H ? H / 2 : Math.max(mY, Math.min(H - mY, hand.y));
+  if (Math.abs(ax - anchor.x) > 8) anchor.x += (ax - anchor.x) * .12;   // 死區:手的小抖動不會讓字糊掉
+  if (Math.abs(ay - anchor.y) > 8) anchor.y += (ay - anchor.y) * .12;
+
+  let cd = 0;
+  if (scene === 'christmas' && target) {
+    const rem = target - Date.now();
+    if (rem <= 0) switchScene('newyear'); else if (rem <= 10000) cd = Math.ceil(rem / 1000);
+  }
+  if (scene === 'newyear') bursts.forEach(b => { if (frame - b.t0 > b.dur) respawn(b); });
+
+  if (scene === 'christmas') {
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    flakes.forEach(f => { f.y += f.s; f.x += Math.sin(t / 1500 + f.s * 9) * .3; if (f.y > H) { f.y = -4; f.x = Math.random() * W; } ctx.fillRect(f.x, f.y, f.r, f.r); });
+  }
+
+  const s = isFist ? 2.4 : 1.8;
+  for (const p of particles) { p.update(t); ctx.globalAlpha = p.a; ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, s, s); }
+  ctx.globalAlpha = 1;
+
+  if (cd) {
+    const f = 1 - ((target - Date.now()) % 1000) / 1000;
+    ctx.save(); ctx.globalAlpha = isFist ? .25 : .85 * (1 - f * .5);
+    ctx.font = `bold ${Math.min(W, H) * .4 * (1.15 - f * .15)}px Arial`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#ffd76a'; ctx.shadowBlur = 30; ctx.fillStyle = '#ffd76a';
+    ctx.fillText(cd, W / 2, H / 2); ctx.restore();
+  }
+  if (gProg > 0) {   // 比 2 的進度圈
+    ctx.strokeStyle = '#ffd76a'; ctx.lineWidth = 5; ctx.beginPath();
+    ctx.arc(hand.x, hand.y, 36, -Math.PI / 2, -Math.PI / 2 + gProg * 6.283); ctx.stroke();
+  }
+  if (flash > 0) {
+    ctx.fillStyle = `rgba(255,240,200,${flash * .3})`; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = `rgba(255,215,106,${flash})`; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(W / 2, H / 2, (1 - flash) * Math.max(W, H) * .7, 0, 6.283); ctx.stroke();
+    flash -= .02;
+  }
+  requestAnimationFrame(animate);
+}
+
+/* ---------- 啟動 ---------- */
+setup(); resize(); setUI(); anchor.x = W / 2; anchor.y = H / 2;
+for (let i = 0; i < COUNT; i++) particles.push(new P(i));
+for (let i = 0; i < 90; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2, s: .3 + Math.random() * .8 });
+if (scene === 'newyear') startBursts(false);
+requestAnimationFrame(animate);
+
+/* ---------- 鏡頭手勢 ---------- */
+const video = document.getElementById('input_video');
+const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+hands.setOptions({ maxNumHands: 1, modelComplexity: 0, minDetectionConfidence: .6, minTrackingConfidence: .6 });
+hands.onResults(r => {
+  const L = r.multiHandLandmarks && r.multiHandLandmarks[0];
+  if (!L) { handSeen = false; camFist = false; twoStart = 0; gProg = 0; return; }
+  handSeen = true;
+  const d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y), palm = d(L[0], L[9]) || 1;
+  // 握拳判斷:四指指尖到手腕的平均距離 / 手掌長度(有遲滯,避免抖動)
+  const ratio = (d(L[8], L[0]) + d(L[12], L[0]) + d(L[16], L[0]) + d(L[20], L[0])) / 4 / palm;
+  if (ratio < 1.25) camFist = true; else if (ratio > 1.5) camFist = false;
+  tgt.x = 1 - L[9].x; tgt.y = L[9].y;
+  // 比 2:食指、中指伸直,無名指、小指彎曲,按住 0.8 秒切換場景
+  const ext = (a, b) => d(L[a], L[0]) > d(L[b], L[0]) * 1.15, cur = (a, b) => d(L[a], L[0]) < d(L[b], L[0]) * 1.05;
+  const two = ext(8, 6) && ext(12, 10) && cur(16, 14) && cur(20, 18), nt = performance.now();
+  if (two && !camFist && nt > coolUntil) {
+    if (!twoStart) twoStart = nt;
+    gProg = Math.min(1, (nt - twoStart) / 800);
+    if (gProg >= 1) { coolUntil = nt + 2500; twoStart = 0; gProg = 0; switchScene(scene === 'christmas' ? 'newyear' : 'christmas'); }
+  } else { twoStart = 0; gProg = 0; }
+});
+new Camera(video, { onFrame: async () => { await hands.send({ image: video }); }, width: 640, height: 480 })
+  .start().catch(() => {});
+
+/* ---------- 沒鏡頭也能測試 ---------- */
+// 空白鍵(按住)/ 觸控按住 = 握拳;N = 切換場景;T = 重新開始 15 秒倒數
+addEventListener('keydown', e => {
+  if (e.code === 'Space') kbFist = true;
+  else if (e.key === 'n' || e.key === 'N') switchScene(scene === 'christmas' ? 'newyear' : 'christmas');
+  else if (e.key === 't' || e.key === 'T') { target = Date.now() + 15000; if (scene !== 'christmas') switchScene('christmas'); }
+});
+addEventListener('keyup', e => { if (e.code === 'Space') kbFist = false; });
+addEventListener('pointerdown', () => { kbFist = true; });
+addEventListener('pointerup', () => { kbFist = false; });
+addEventListener('pointermove', e => { if (!handSeen) { tgt.x = e.clientX / W; tgt.y = e.clientY / H; } });
 </script>
 </body>
 </html>
